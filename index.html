@@ -668,7 +668,7 @@
           <!-- TCPA Consent (legally required for US SMS/email marketing) -->
           <div class="consent-block">
             <div class="consent-item">
-              <input type="checkbox" id="sms_consent" name="sms_consent" />
+              <input type="checkbox" id="sms_consent" name="sms_consent" checked />
               <label for="sms_consent">
                 <strong>SMS Updates:</strong> I agree to receive text messages from Luxe Med Spa about my appointment, specials, and follow-up care. Message &amp; data rates may apply. Reply STOP to opt out at any time.
               </label>
@@ -680,7 +680,7 @@
               </label>
             </div>
           </div>
-          <span class="field-error" id="err_consent" style="margin-top:-.5rem; margin-bottom:.75rem;">Please accept at least one communication method.</span>
+          <span class="field-error" id="err_consent" style="margin-top:-.5rem; margin-bottom:.75rem;">Please accept both SMS and Email consent to continue.</span>
 
           <button type="submit" class="btn-submit" id="submitBtn">
             <span class="btn-text">Request My Free Consultation →</span>
@@ -836,7 +836,7 @@
       if (!phoneOk) valid = false;
 
       // Consent (at least one required)
-      const consentOk = data.sms_consent || data.email_consent;
+      const consentOk = data.sms_consent && data.email_consent;
       const consentErr = document.getElementById('err_consent');
       if (consentErr) consentErr.classList.toggle('visible', !consentOk);
       if (!consentOk) valid = false;
