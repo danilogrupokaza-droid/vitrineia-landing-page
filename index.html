@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luxe Med Spa – Look & Feel Your Best</title>
+  <meta name="description" content="Miami's premier medical spa. Book your free consultation today and discover the treatments that will transform your confidence." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & Variables ───────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:   #F7F3EE;
+      --sand:    #E8DDD0;
+      --stone:   #C4B5A5;
+      --espresso:#2C1F14;
+      --gold:    #B8975A;
+      --gold-lt: #D4B47A;
+      --white:   #FFFFFF;
+      --error:   #C0392B;
+      --success: #1E7D45;
+      --ff-serif: 'Cormorant Garamond', Georgia, serif;
+      --ff-sans:  'DM Sans', sans-serif;
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--ff-sans);
+      background: var(--cream);
+      color: var(--espresso);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Utility ─────────────────────────────────────────────── */
+    .visually-hidden {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap;
+    }
+
+    /* ── Noise texture overlay ───────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: .035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* ── Header / Nav ────────────────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 3rem;
+      background: rgba(247,243,238,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--sand);
+    }
+
+    .logo {
+      font-family: var(--ff-serif);
+      font-size: 1.35rem;
+      font-weight: 300;
+      letter-spacing: .08em;
+      color: var(--espresso);
+      text-decoration: none;
+    }
+    .logo span { color: var(--gold); }
+
+    nav a {
+      font-size: .8rem;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--espresso);
+      text-decoration: none;
+      margin-left: 2rem;
+      opacity: .65;
+      transition: opacity .2s;
+    }
+    nav a:hover { opacity: 1; }
+
+    /* ── Hero ────────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero__visual {
+      background:
+        linear-gradient(160deg, rgba(44,31,20,.18) 0%, rgba(44,31,20,.55) 100%),
+        url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1200&q=80') center/cover no-repeat;
+      position: relative;
+    }
+
+    .hero__visual::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, transparent 70%, var(--cream) 100%);
+    }
+
+    .hero__content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 4rem 4rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero__eyebrow {
+      font-family: var(--ff-sans);
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fadeUp .8s var(--ease-out-expo) .2s forwards;
+    }
+
+    .hero__title {
+      font-family: var(--ff-serif);
+      font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: var(--espresso);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp .9s var(--ease-out-expo) .35s forwards;
+    }
+    .hero__title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero__sub {
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--espresso);
+      opacity: 0;
+      max-width: 38ch;
+      transform: translateY(12px);
+      animation: fadeUp .9s var(--ease-out-expo) .5s forwards;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero__badges {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp .9s var(--ease-out-expo) .65s forwards;
+      margin-bottom: 2.5rem;
+    }
+
+    .badge {
+      display: flex; align-items: center; gap: .45rem;
+      font-size: .78rem; font-weight: 500;
+      color: var(--espresso); opacity: .7;
+    }
+    .badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* ── Form card ───────────────────────────────────────────── */
+    .form-card {
+      background: var(--white);
+      border: 1px solid var(--sand);
+      border-radius: 2px;
+      padding: 2.25rem;
+      box-shadow: 0 8px 48px rgba(44,31,20,.08);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 1s var(--ease-out-expo) .8s forwards;
+      max-width: 440px;
+    }
+
+    .form-card__title {
+      font-family: var(--ff-serif);
+      font-size: 1.45rem;
+      font-weight: 400;
+      color: var(--espresso);
+      margin-bottom: .35rem;
+    }
+
+    .form-card__sub {
+      font-size: .82rem;
+      color: var(--espresso);
+      opacity: .55;
+      margin-bottom: 1.75rem;
+      line-height: 1.5;
+    }
+
+    .form-group { margin-bottom: 1rem; }
+
+    .form-group label {
+      display: block;
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--espresso);
+      opacity: .6;
+      margin-bottom: .4rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: .75rem 1rem;
+      border: 1px solid var(--sand);
+      border-radius: 2px;
+      background: var(--cream);
+      font-family: var(--ff-sans);
+      font-size: .9rem;
+      color: var(--espresso);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      -webkit-appearance: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(184,151,90,.12);
+      background: var(--white);
+    }
+
+    .form-group input.error,
+    .form-group select.error {
+      border-color: var(--error);
+    }
+
+    .field-error {
+      font-size: .75rem;
+      color: var(--error);
+      margin-top: .3rem;
+      display: none;
+    }
+    .field-error.visible { display: block; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+    }
+
+    /* ── TCPA consent ────────────────────────────────────────── */
+    .consent-block {
+      background: var(--cream);
+      border: 1px solid var(--sand);
+      border-radius: 2px;
+      padding: 1rem;
+      margin: 1.25rem 0;
+    }
+
+    .consent-item {
+      display: flex;
+      align-items: flex-start;
+      gap: .75rem;
+      margin-bottom: .75rem;
+    }
+    .consent-item:last-child { margin-bottom: 0; }
+
+    .consent-item input[type="checkbox"] {
+      width: 16px; height: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+
+    .consent-item label {
+      font-size: .75rem;
+      line-height: 1.55;
+      color: var(--espresso);
+      opacity: .7;
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 400;
+    }
+
+    .consent-item label strong { font-weight: 500; opacity: 1; }
+
+    /* ── Submit button ───────────────────────────────────────── */
+    .btn-submit {
+      width: 100%;
+      padding: .9rem 1.5rem;
+      background: var(--espresso);
+      color: var(--cream);
+      border: none;
+      border-radius: 2px;
+      font-family: var(--ff-sans);
+      font-size: .8rem;
+      font-weight: 500;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .25s, transform .15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-submit:hover { background: #3d2b1a; }
+    .btn-submit:active { transform: scale(.99); }
+    .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+    .btn-submit .btn-text { transition: opacity .2s; }
+    .btn-submit .btn-loader {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .2s;
+    }
+    .btn-submit.loading .btn-text { opacity: 0; }
+    .btn-submit.loading .btn-loader { opacity: 1; }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(247,243,238,.3);
+      border-top-color: var(--cream);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    .form-note {
+      font-size: .7rem;
+      color: var(--espresso);
+      opacity: .4;
+      text-align: center;
+      margin-top: .75rem;
+      line-height: 1.5;
+    }
+
+    /* ── Success state ───────────────────────────────────────── */
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .success-state.visible { display: block; }
+
+    .success-icon {
+      width: 52px; height: 52px;
+      background: var(--success);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.25rem;
+    }
+
+    .success-icon svg { width: 24px; height: 24px; color: white; }
+
+    .success-state h3 {
+      font-family: var(--ff-serif);
+      font-size: 1.6rem;
+      font-weight: 400;
+      margin-bottom: .5rem;
+    }
+
+    .success-state p {
+      font-size: .88rem;
+      opacity: .6;
+      line-height: 1.6;
+    }
+
+    /* ── Global error ────────────────────────────────────────── */
+    .global-error {
+      background: #fdf0ef;
+      border: 1px solid #f5c6c2;
+      border-radius: 2px;
+      padding: .75rem 1rem;
+      font-size: .8rem;
+      color: var(--error);
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .global-error.visible { display: block; }
+
+    /* ── Social proof strip ──────────────────────────────────── */
+    .proof {
+      background: var(--espresso);
+      color: var(--cream);
+      padding: 2.5rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4rem;
+      flex-wrap: wrap;
+    }
+
+    .proof-stat {
+      text-align: center;
+    }
+
+    .proof-stat__number {
+      font-family: var(--ff-serif);
+      font-size: 2.4rem;
+      font-weight: 300;
+      color: var(--gold-lt);
+      line-height: 1;
+      display: block;
+    }
+
+    .proof-stat__label {
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      opacity: .5;
+      margin-top: .3rem;
+      display: block;
+    }
+
+    .proof-divider {
+      width: 1px;
+      height: 40px;
+      background: rgba(247,243,238,.15);
+    }
+
+    /* ── Benefits section ────────────────────────────────────── */
+    .benefits {
+      padding: 6rem 3rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: var(--ff-serif);
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 300;
+      line-height: 1.15;
+      color: var(--espresso);
+      max-width: 26ch;
+      margin-bottom: 3.5rem;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .benefit-card {
+      padding: 2rem;
+      border: 1px solid var(--sand);
+      border-radius: 2px;
+      background: var(--white);
+      transition: box-shadow .3s, transform .3s;
+    }
+
+    .benefit-card:hover {
+      box-shadow: 0 12px 40px rgba(44,31,20,.07);
+      transform: translateY(-3px);
+    }
+
+    .benefit-number {
+      font-family: var(--ff-serif);
+      font-size: 3rem;
+      font-weight: 300;
+      color: var(--sand);
+      line-height: 1;
+      margin-bottom: .75rem;
+    }
+
+    .benefit-title {
+      font-family: var(--ff-serif);
+      font-size: 1.2rem;
+      font-weight: 400;
+      margin-bottom: .5rem;
+    }
+
+    .benefit-text {
+      font-size: .84rem;
+      line-height: 1.7;
+      opacity: .6;
+    }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    footer {
+      background: var(--espresso);
+      color: var(--cream);
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    footer .logo { color: var(--cream); }
+
+    footer p {
+      font-size: .72rem;
+      opacity: .4;
+      line-height: 1.6;
+      max-width: 60ch;
+    }
+
+    /* ── Animations ──────────────────────────────────────────── */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      header { padding: 1rem 1.5rem; }
+      nav { display: none; }
+
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .hero__visual {
+        height: 280px;
+      }
+
+      .hero__visual::after {
+        background: linear-gradient(to bottom, transparent 60%, var(--cream) 100%);
+      }
+
+      .hero__content {
+        padding: 2.5rem 1.5rem 3rem;
+      }
+
+      .form-card { max-width: 100%; }
+      .form-row { grid-template-columns: 1fr; }
+
+      .proof {
+        padding: 2rem 1.5rem;
+        gap: 2rem;
+      }
+      .proof-divider { display: none; }
+
+      .benefits {
+        padding: 4rem 1.5rem;
+      }
+
+      .benefits-grid {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        padding: 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────────────── -->
+  <header>
+    <a href="#" class="logo">Luxe <span>Med Spa</span></a>
+    <nav>
+      <a href="#treatments">Treatments</a>
+      <a href="#about">About</a>
+      <a href="#form-section">Book Free Consult</a>
+    </nav>
+  </header>
+
+  <!-- ── Hero ────────────────────────────────────────────────── -->
+  <section class="hero" id="form-section">
+    <div class="hero__visual" role="img" aria-label="Luxurious med spa treatment room"></div>
+
+    <div class="hero__content">
+      <p class="hero__eyebrow">Miami's Premier Medical Spa</p>
+
+      <h1 class="hero__title">
+        Look &amp; Feel<br>
+        <em>Effortlessly</em> You.
+      </h1>
+
+      <p class="hero__sub">
+        Science-backed treatments, personalized care. Book your free consultation and discover what's possible for your skin and confidence.
+      </p>
+
+      <div class="hero__badges">
+        <span class="badge">Board-Certified Practitioners</span>
+        <span class="badge">FDA-Approved Treatments</span>
+        <span class="badge">Same-Week Appointments</span>
+      </div>
+
+      <!-- ── Lead Form ── -->
+      <div class="form-card" role="main">
+        <h2 class="form-card__title">Book Your Free Consultation</h2>
+        <p class="form-card__sub">No commitment. No pressure. Just honest advice from our specialists.</p>
+
+        <div class="global-error" id="globalError" role="alert"></div>
+
+        <form id="leadForm" novalidate>
+          <!-- Hidden UTM tracking -->
+          <input type="hidden" id="utm_source" name="utm_source" />
+          <input type="hidden" id="utm_medium" name="utm_medium" />
+          <input type="hidden" id="utm_campaign" name="utm_campaign" />
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="full_name">Full Name *</label>
+              <input type="text" id="full_name" name="full_name"
+                placeholder="Amanda Torres"
+                autocomplete="name" required />
+              <span class="field-error" id="err_full_name">Please enter your full name.</span>
+            </div>
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input type="email" id="email" name="email"
+                placeholder="amanda@email.com"
+                autocomplete="email" required />
+              <span class="field-error" id="err_email">Please enter a valid email.</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phone">Phone *</label>
+              <input type="tel" id="phone" name="phone"
+                placeholder="(305) 555-0100"
+                autocomplete="tel" required />
+              <span class="field-error" id="err_phone">Please enter a valid US phone number.</span>
+            </div>
+            <div class="form-group">
+              <label for="interest">I'm interested in</label>
+              <select id="interest" name="interest">
+                <option value="">Select treatment...</option>
+                <option value="botox">Botox / Dysport</option>
+                <option value="filler">Dermal Fillers</option>
+                <option value="laser">Laser Treatments</option>
+                <option value="skin">Skin Rejuvenation</option>
+                <option value="body">Body Contouring</option>
+                <option value="other">Not sure yet</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- TCPA Consent (legally required for US SMS/email marketing) -->
+          <div class="consent-block">
+            <div class="consent-item">
+              <input type="checkbox" id="sms_consent" name="sms_consent" />
+              <label for="sms_consent">
+                <strong>SMS Updates:</strong> I agree to receive text messages from Luxe Med Spa about my appointment, specials, and follow-up care. Message &amp; data rates may apply. Reply STOP to opt out at any time.
+              </label>
+            </div>
+            <div class="consent-item">
+              <input type="checkbox" id="email_consent" name="email_consent" checked />
+              <label for="email_consent">
+                <strong>Email Updates:</strong> I agree to receive emails from Luxe Med Spa. You can unsubscribe at any time.
+              </label>
+            </div>
+          </div>
+          <span class="field-error" id="err_consent" style="margin-top:-.5rem; margin-bottom:.75rem;">Please accept at least one communication method.</span>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <span class="btn-text">Request My Free Consultation →</span>
+            <span class="btn-loader" aria-hidden="true">
+              <span class="spinner"></span>
+            </span>
+          </button>
+
+          <p class="form-note">🔒 Your information is private and never sold to third parties.</p>
+        </form>
+
+        <!-- Success state -->
+        <div class="success-state" id="successState">
+          <div class="success-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <h3>You're on the list!</h3>
+          <p>We'll reach out within <strong>24 hours</strong> to confirm your free consultation. Check your email for details.</p>
+        </div>
+      </div><!-- /.form-card -->
+
+    </div><!-- /.hero__content -->
+  </section>
+
+  <!-- ── Social proof ─────────────────────────────────────────── -->
+  <div class="proof">
+    <div class="proof-stat">
+      <span class="proof-stat__number">2,400+</span>
+      <span class="proof-stat__label">Happy clients</span>
+    </div>
+    <div class="proof-divider"></div>
+    <div class="proof-stat">
+      <span class="proof-stat__number">98%</span>
+      <span class="proof-stat__label">Satisfaction rate</span>
+    </div>
+    <div class="proof-divider"></div>
+    <div class="proof-stat">
+      <span class="proof-stat__number">12+</span>
+      <span class="proof-stat__label">Years in Miami</span>
+    </div>
+    <div class="proof-divider"></div>
+    <div class="proof-stat">
+      <span class="proof-stat__number">Free</span>
+      <span class="proof-stat__label">First consultation</span>
+    </div>
+  </div>
+
+  <!-- ── Benefits ─────────────────────────────────────────────── -->
+  <section class="benefits" id="treatments">
+    <p class="section-label">Why choose us</p>
+    <h2 class="section-title">A Different Kind of Med Spa Experience</h2>
+
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-number">01</div>
+        <h3 class="benefit-title">Honest consultations</h3>
+        <p class="benefit-text">We'll tell you exactly what we think will work for you — and what won't. No upselling, no pressure.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-number">02</div>
+        <h3 class="benefit-title">Board-certified team</h3>
+        <p class="benefit-text">Every treatment is performed or supervised by a licensed medical professional. Your safety is non-negotiable.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-number">03</div>
+        <h3 class="benefit-title">Results that last</h3>
+        <p class="benefit-text">We focus on natural, long-lasting outcomes — not dramatic changes that fade in weeks. Real results for real life.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────────────── -->
+  <footer>
+    <a href="#" class="logo">Luxe <span>Med Spa</span></a>
+    <p>
+      © 2026 Luxe Med Spa, Miami FL. By submitting this form you agree to our
+      <a href="#" style="color:var(--gold-lt);opacity:1">Privacy Policy</a> and
+      <a href="#" style="color:var(--gold-lt);opacity:1">Terms of Service</a>.
+      SMS messages are sent only with your explicit consent (TCPA compliant).
+    </p>
+  </footer>
+
+  <script>
+    // ── Config ────────────────────────────────────────────────
+    // Replace with your Railway API URL and the Business ID from the seed.
+    const API_URL     = 'https://YOUR_RAILWAY_URL/api/leads';
+    const BUSINESS_ID = '8308b000-eb0d-4ac4-a6ad-1e3ca9399936';
+
+    // ── UTM tracking ─────────────────────────────────────────
+    (function captureUTM() {
+      const params = new URLSearchParams(window.location.search);
+      ['utm_source', 'utm_medium', 'utm_campaign'].forEach(key => {
+        const el = document.getElementById(key);
+        if (el && params.get(key)) el.value = params.get(key);
+      });
+      // Fallback: detect source from referrer
+      if (!params.get('utm_source')) {
+        const ref = document.referrer;
+        const src = document.getElementById('utm_source');
+        if (src) {
+          if (ref.includes('instagram.com')) src.value = 'instagram';
+          else if (ref.includes('google.com'))   src.value = 'google';
+          else if (ref.includes('facebook.com')) src.value = 'facebook';
+          else if (ref)                          src.value = 'referral';
+          else                                   src.value = 'direct';
+        }
+      }
+    })();
+
+    // ── Phone formatting ─────────────────────────────────────
+    document.getElementById('phone').addEventListener('input', function() {
+      let v = this.value.replace(/\D/g, '');
+      if (v.length >= 10) {
+        v = v.slice(-10);
+        this.value = `(${v.slice(0,3)}) ${v.slice(3,6)}-${v.slice(6)}`;
+      }
+    });
+
+    // ── Helpers ───────────────────────────────────────────────
+    function toE164(phone) {
+      const digits = phone.replace(/\D/g, '');
+      // Handle 10-digit US numbers
+      return digits.length === 10 ? `+1${digits}` : `+${digits}`;
+    }
+
+    function showFieldError(fieldId, errorId, show) {
+      const field = document.getElementById(fieldId);
+      const error = document.getElementById(errorId);
+      if (!field || !error) return;
+      field.classList.toggle('error', show);
+      error.classList.toggle('visible', show);
+    }
+
+    function validateForm(data) {
+      let valid = true;
+
+      // Name
+      const nameOk = data.full_name.trim().length >= 2;
+      showFieldError('full_name', 'err_full_name', !nameOk);
+      if (!nameOk) valid = false;
+
+      // Email
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
+      showFieldError('email', 'err_email', !emailOk);
+      if (!emailOk) valid = false;
+
+      // Phone (must resolve to 10 US digits)
+      const digits = data.phone.replace(/\D/g, '');
+      const phoneOk = digits.length === 10 || (digits.length === 11 && digits[0] === '1');
+      showFieldError('phone', 'err_phone', !phoneOk);
+      if (!phoneOk) valid = false;
+
+      // Consent (at least one required)
+      const consentOk = data.sms_consent || data.email_consent;
+      const consentErr = document.getElementById('err_consent');
+      if (consentErr) consentErr.classList.toggle('visible', !consentOk);
+      if (!consentOk) valid = false;
+
+      return valid;
+    }
+
+    // ── Form submission ───────────────────────────────────────
+    document.getElementById('leadForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const btn  = document.getElementById('submitBtn');
+      const globalErr = document.getElementById('globalError');
+
+      const data = {
+        full_name:     form.full_name.value.trim(),
+        email:         form.email.value.trim().toLowerCase(),
+        phone:         form.phone.value,
+        sms_consent:   form.sms_consent.checked,
+        email_consent: form.email_consent.checked,
+        business_id:   BUSINESS_ID,
+        source:        document.getElementById('utm_source').value || 'organic',
+        notes:         form.interest.value ? `Interest: ${form.interest.value}` : null,
+      };
+
+      // Client-side validation
+      if (!validateForm(data)) return;
+
+      // Convert phone to E.164
+      data.phone = toE164(data.phone);
+
+      // Loading state
+      btn.disabled = true;
+      btn.classList.add('loading');
+      globalErr.classList.remove('visible');
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        const json = await res.json();
+
+        if (res.ok || res.status === 409) {
+          // 409 = already registered, still show success (idempotent UX)
+          form.style.display = 'none';
+          document.getElementById('successState').classList.add('visible');
+
+          // Fire simple analytics event (if gtag loaded)
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'lead_submitted', { event_category: 'engagement' });
+          }
+        } else {
+          throw new Error(json.error || 'Something went wrong. Please try again.');
+        }
+
+      } catch (err) {
+        globalErr.textContent = err.message;
+        globalErr.classList.add('visible');
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    });
+  </script>
+</body>
+</html>
