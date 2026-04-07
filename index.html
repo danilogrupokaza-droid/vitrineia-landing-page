@@ -3,254 +3,730 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Luxe Med Spa – Look & Feel Your Best</title>
-  <meta name="description" content="Miami's premier medical spa. Book your free consultation today and discover the treatments that will transform your confidence." />
+  <title>Kingdom Cuts — Stop Losing Clients</title>
+  <meta name="description" content="Miami's sharpest barber shop. Book your cut online — instant confirmation, no waiting, no missed calls." />
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <!-- Calendly -->
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
+  <style>
+    /* ── Calendly modal overlay ───────────────────────────────── */
+    .calendly-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(8,8,8,.92);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .calendly-overlay.open {
+      display: flex;
+    }
+    .calendly-modal {
+      background: var(--gray);
+      border: 1px solid var(--gray-lt);
+      width: 100%;
+      max-width: 900px;
+      max-height: 90vh;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .calendly-modal__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.75rem;
+      border-bottom: 1px solid var(--gray-lt);
+      flex-shrink: 0;
+    }
+    .calendly-modal__title {
+      font-family: var(--ff-display);
+      font-size: 1.5rem;
+      letter-spacing: .05em;
+      color: var(--white);
+    }
+    .calendly-modal__title span { color: var(--red); }
+    .calendly-modal__close {
+      width: 36px; height: 36px;
+      background: var(--gray-lt);
+      border: none;
+      color: var(--white);
+      font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: none;
+      transition: background .2s;
+      flex-shrink: 0;
+    }
+    .calendly-modal__close:hover { background: var(--red); }
+    .calendly-modal__body {
+      flex: 1;
+      overflow: hidden;
+    }
+    .calendly-inline-widget {
+      width: 100%;
+      height: 650px;
+    }
+    @media (max-width: 600px) {
+      .calendly-inline-widget { height: 580px; }
+      .calendly-overlay { padding: .5rem; }
+    }
+  </style>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,700&family=Barlow:wght@300;400&display=swap" rel="stylesheet" />
 
   <style>
-    /* ── Reset & Variables ───────────────────────────────────── */
+    /* ── Reset ───────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --cream:   #F7F3EE;
-      --sand:    #E8DDD0;
-      --stone:   #C4B5A5;
-      --espresso:#2C1F14;
-      --gold:    #B8975A;
-      --gold-lt: #D4B47A;
-      --white:   #FFFFFF;
-      --error:   #C0392B;
-      --success: #1E7D45;
-      --ff-serif: 'Cormorant Garamond', Georgia, serif;
-      --ff-sans:  'DM Sans', sans-serif;
-      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
     html { scroll-behavior: smooth; }
 
+    /* ── Variables ───────────────────────────────────────────── */
+    :root {
+      --black:   #080808;
+      --white:   #F2F0EB;
+      --red:     #D62828;
+      --red-dim: #8B1A1A;
+      --gray:    #1A1A1A;
+      --gray-lt: #2E2E2E;
+      --gold:    #C9A84C;
+      --ff-display: 'Bebas Neue', sans-serif;
+      --ff-cond:    'Barlow Condensed', sans-serif;
+      --ff-body:    'Barlow', sans-serif;
+    }
+
+    /* ── Custom cursor ───────────────────────────────────────── */
+    * { cursor: none !important; }
+
+    #cursor {
+      position: fixed;
+      width: 32px; height: 32px;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform .1s ease;
+      mix-blend-mode: difference;
+    }
+
+    #cursor svg { width: 100%; height: 100%; }
+
+    #cursor-dot {
+      position: fixed;
+      width: 6px; height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform .05s ease;
+    }
+
     body {
-      font-family: var(--ff-sans);
-      background: var(--cream);
-      color: var(--espresso);
+      font-family: var(--ff-body);
+      background: var(--black);
+      color: var(--white);
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Utility ─────────────────────────────────────────────── */
-    .visually-hidden {
-      position: absolute; width: 1px; height: 1px;
-      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap;
-    }
-
-    /* ── Noise texture overlay ───────────────────────────────── */
-    body::before {
+    /* ── Grain overlay ───────────────────────────────────────── */
+    body::after {
       content: '';
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      opacity: .035;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      position: fixed; inset: 0;
+      z-index: 200;
+      pointer-events: none;
+      opacity: .04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    /* ── Header / Nav ────────────────────────────────────────── */
-    header {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.25rem 3rem;
-      background: rgba(247,243,238,.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--sand);
-    }
-
-    .logo {
-      font-family: var(--ff-serif);
-      font-size: 1.35rem;
-      font-weight: 300;
-      letter-spacing: .08em;
-      color: var(--espresso);
-      text-decoration: none;
-    }
-    .logo span { color: var(--gold); }
-
-    nav a {
-      font-size: .8rem;
-      font-weight: 500;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--espresso);
-      text-decoration: none;
-      margin-left: 2rem;
-      opacity: .65;
-      transition: opacity .2s;
-    }
-    nav a:hover { opacity: 1; }
-
-    /* ── Hero ────────────────────────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      position: relative;
+    /* ── Marquee ticker ──────────────────────────────────────── */
+    .ticker {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: var(--red);
       overflow: hidden;
-    }
-
-    .hero__visual {
-      background:
-        linear-gradient(160deg, rgba(44,31,20,.18) 0%, rgba(44,31,20,.55) 100%),
-        url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1200&q=80') center/cover no-repeat;
-      position: relative;
-    }
-
-    .hero__visual::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(to right, transparent 70%, var(--cream) 100%);
-    }
-
-    .hero__content {
+      height: 32px;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 8rem 4rem 4rem 3rem;
+      align-items: center;
+    }
+
+    .ticker__track {
+      display: flex;
+      white-space: nowrap;
+      animation: ticker 18s linear infinite;
+      gap: 0;
+    }
+
+    .ticker__item {
+      font-family: var(--ff-cond);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--white);
+      padding: 0 3rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .ticker__dot {
+      width: 4px; height: 4px;
+      background: rgba(255,255,255,.5);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── Nav ─────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 32px; left: 0; right: 0;
+      z-index: 99;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 3rem;
+      mix-blend-mode: normal;
+    }
+
+    nav::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(8,8,8,.95) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .nav__logo {
+      font-family: var(--ff-display);
+      font-size: 1.6rem;
+      letter-spacing: .08em;
+      color: var(--white);
+      text-decoration: none;
       position: relative;
       z-index: 1;
     }
 
-    .hero__eyebrow {
-      font-family: var(--ff-sans);
-      font-size: .72rem;
-      font-weight: 500;
+    .nav__logo span { color: var(--red); }
+
+    .nav__cta {
+      position: relative;
+      z-index: 1;
+      font-family: var(--ff-cond);
+      font-size: .75rem;
+      font-weight: 700;
       letter-spacing: .2em;
       text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 1.5rem;
+      color: var(--black);
+      background: var(--white);
+      padding: .6rem 1.5rem;
+      text-decoration: none;
+      transition: background .2s, color .2s;
+    }
+
+    .nav__cta:hover {
+      background: var(--red);
+      color: var(--white);
+    }
+
+    /* ── Hero ────────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      padding: 32px 0 0;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero__bg {
+      position: absolute;
+      inset: 0;
+      background:
+        url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1400&q=80') center/cover no-repeat;
+      filter: grayscale(100%) contrast(1.2);
+      opacity: .18;
+    }
+
+    .hero__bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(8,8,8,.4) 0%, rgba(8,8,8,.0) 40%, rgba(8,8,8,.9) 100%),
+        linear-gradient(to right, rgba(8,8,8,.6) 0%, transparent 60%);
+    }
+
+    /* Vertical side text */
+    .hero__side {
+      position: absolute;
+      right: 2.5rem;
+      top: 50%;
+      transform: translateY(-50%) rotate(90deg);
+      transform-origin: center;
+      font-family: var(--ff-cond);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--white);
+      opacity: .3;
+      white-space: nowrap;
+    }
+
+    .hero__content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 8rem 3rem 3rem;
+    }
+
+    .hero__issue {
+      font-family: var(--ff-cond);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1rem;
       opacity: 0;
-      transform: translateY(12px);
-      animation: fadeUp .8s var(--ease-out-expo) .2s forwards;
+      animation: fadeIn .6s ease .2s forwards;
     }
 
     .hero__title {
-      font-family: var(--ff-serif);
-      font-size: clamp(2.8rem, 4.5vw, 4.2rem);
-      font-weight: 300;
-      line-height: 1.1;
-      color: var(--espresso);
+      font-family: var(--ff-display);
+      font-size: clamp(5rem, 14vw, 13rem);
+      line-height: .88;
+      letter-spacing: -.01em;
+      color: var(--white);
       margin-bottom: 1.5rem;
       opacity: 0;
-      transform: translateY(16px);
-      animation: fadeUp .9s var(--ease-out-expo) .35s forwards;
+      animation: slideUp .8s cubic-bezier(0.16, 1, 0.3, 1) .3s forwards;
     }
-    .hero__title em {
-      font-style: italic;
-      color: var(--gold);
+
+    .hero__title .outline {
+      -webkit-text-stroke: 2px var(--white);
+      color: transparent;
+    }
+
+    .hero__title .red { color: var(--red); }
+
+    .hero__bottom {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 2rem;
+      opacity: 0;
+      animation: fadeIn .8s ease .7s forwards;
     }
 
     .hero__sub {
-      font-size: 1rem;
+      font-family: var(--ff-cond);
+      font-size: 1.1rem;
       font-weight: 300;
-      line-height: 1.7;
-      color: var(--espresso);
-      opacity: 0;
-      max-width: 38ch;
-      transform: translateY(12px);
-      animation: fadeUp .9s var(--ease-out-expo) .5s forwards;
-      margin-bottom: 2.5rem;
+      line-height: 1.5;
+      color: var(--white);
+      opacity: .7;
+      max-width: 36ch;
     }
 
-    .hero__badges {
-      display: flex; gap: 1rem; flex-wrap: wrap;
-      opacity: 0;
-      animation: fadeUp .9s var(--ease-out-expo) .65s forwards;
-      margin-bottom: 2.5rem;
+    /* ── Stat counter ────────────────────────────────────────── */
+    .stat-box {
+      background: var(--red);
+      padding: 1.25rem 1.75rem;
+      flex-shrink: 0;
+      text-align: center;
+      min-width: 160px;
     }
 
-    .badge {
-      display: flex; align-items: center; gap: .45rem;
-      font-size: .78rem; font-weight: 500;
-      color: var(--espresso); opacity: .7;
+    .stat-box__num {
+      font-family: var(--ff-display);
+      font-size: 3rem;
+      line-height: 1;
+      color: var(--white);
+      display: block;
     }
-    .badge::before {
+
+    .stat-box__label {
+      font-family: var(--ff-cond);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.7);
+      margin-top: .25rem;
+      display: block;
+    }
+
+    /* ── Scroll indicator ────────────────────────────────────── */
+    .scroll-hint {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem 3rem;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+
+    .scroll-hint__line {
+      width: 40px;
+      height: 1px;
+      background: var(--red);
+    }
+
+    .scroll-hint__text {
+      font-family: var(--ff-cond);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--white);
+      opacity: .4;
+    }
+
+    /* ── Problem section ─────────────────────────────────────── */
+    .problem {
+      padding: 7rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      border-top: 1px solid var(--gray-lt);
+    }
+
+    .section-tag {
+      font-family: var(--ff-cond);
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .section-tag::before {
       content: '';
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--gold);
+      width: 24px;
+      height: 1px;
+      background: var(--red);
+    }
+
+    .problem__title {
+      font-family: var(--ff-display);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      line-height: .9;
+      color: var(--white);
+    }
+
+    .problem__title .outline {
+      -webkit-text-stroke: 1px rgba(255,255,255,.4);
+      color: transparent;
+    }
+
+    .problem__right {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .problem__stat {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--gray-lt);
+    }
+
+    .problem__stat:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .problem__stat-num {
+      font-family: var(--ff-display);
+      font-size: 4rem;
+      line-height: 1;
+      color: var(--red);
       flex-shrink: 0;
     }
 
-    /* ── Form card ───────────────────────────────────────────── */
+    .problem__stat-text {
+      padding-top: .5rem;
+    }
+
+    .problem__stat-title {
+      font-family: var(--ff-cond);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: .4rem;
+    }
+
+    .problem__stat-desc {
+      font-size: .85rem;
+      line-height: 1.6;
+      color: var(--white);
+      opacity: .5;
+    }
+
+    /* ── How it works ────────────────────────────────────────── */
+    .how {
+      background: var(--gray);
+      padding: 7rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .how::before {
+      content: 'HOW';
+      position: absolute;
+      right: -2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--ff-display);
+      font-size: 20rem;
+      color: rgba(255,255,255,.02);
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    .how__header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 4rem;
+      gap: 2rem;
+    }
+
+    .how__title {
+      font-family: var(--ff-display);
+      font-size: clamp(3rem, 7vw, 6rem);
+      line-height: .9;
+      color: var(--white);
+    }
+
+    .how__sub {
+      font-size: .9rem;
+      line-height: 1.7;
+      color: var(--white);
+      opacity: .5;
+      max-width: 32ch;
+      text-align: right;
+    }
+
+    .how__steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--gray-lt);
+    }
+
+    .how__step {
+      background: var(--gray);
+      padding: 2.5rem;
+      position: relative;
+      transition: background .3s;
+    }
+
+    .how__step:hover { background: var(--gray-lt); }
+
+    .how__step-num {
+      font-family: var(--ff-display);
+      font-size: 5rem;
+      line-height: 1;
+      color: rgba(255,255,255,.06);
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+    }
+
+    .how__step-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .how__step-icon svg { width: 20px; height: 20px; color: white; }
+
+    .how__step-title {
+      font-family: var(--ff-cond);
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: .75rem;
+    }
+
+    .how__step-desc {
+      font-size: .85rem;
+      line-height: 1.7;
+      color: var(--white);
+      opacity: .5;
+    }
+
+    .how__time {
+      margin-top: .75rem;
+      font-family: var(--ff-cond);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+
+    /* ── Form section ────────────────────────────────────────── */
+    .form-section {
+      padding: 7rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: start;
+    }
+
+    .form-left__tag { margin-bottom: 1.5rem; }
+
+    .form-left__title {
+      font-family: var(--ff-display);
+      font-size: clamp(3rem, 6vw, 5rem);
+      line-height: .9;
+      color: var(--white);
+      margin-bottom: 2rem;
+    }
+
+    .form-left__title .outline {
+      -webkit-text-stroke: 1px rgba(255,255,255,.3);
+      color: transparent;
+    }
+
+    .form-left__desc {
+      font-size: .9rem;
+      line-height: 1.8;
+      color: var(--white);
+      opacity: .5;
+      margin-bottom: 2.5rem;
+      max-width: 38ch;
+    }
+
+    .proof-items {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .proof-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: var(--ff-cond);
+      font-size: .9rem;
+      font-weight: 400;
+      color: var(--white);
+      opacity: .6;
+    }
+
+    .proof-item::before {
+      content: '';
+      width: 20px;
+      height: 1px;
+      background: var(--red);
+      flex-shrink: 0;
+    }
+
+    /* ── Form ────────────────────────────────────────────────── */
     .form-card {
-      background: var(--white);
-      border: 1px solid var(--sand);
-      border-radius: 2px;
-      padding: 2.25rem;
-      box-shadow: 0 8px 48px rgba(44,31,20,.08);
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeUp 1s var(--ease-out-expo) .8s forwards;
-      max-width: 440px;
+      background: var(--gray);
+      border: 1px solid var(--gray-lt);
+      padding: 2.5rem;
     }
 
     .form-card__title {
-      font-family: var(--ff-serif);
-      font-size: 1.45rem;
-      font-weight: 400;
-      color: var(--espresso);
-      margin-bottom: .35rem;
+      font-family: var(--ff-display);
+      font-size: 2rem;
+      letter-spacing: .03em;
+      color: var(--white);
+      margin-bottom: .4rem;
     }
 
     .form-card__sub {
-      font-size: .82rem;
-      color: var(--espresso);
-      opacity: .55;
-      margin-bottom: 1.75rem;
+      font-size: .8rem;
+      color: var(--white);
+      opacity: .4;
+      margin-bottom: 2rem;
       line-height: 1.5;
     }
+
+    .global-error {
+      background: rgba(214,40,40,.15);
+      border: 1px solid var(--red-dim);
+      padding: .75rem 1rem;
+      font-size: .8rem;
+      color: #ff8080;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .global-error.visible { display: block; }
 
     .form-group { margin-bottom: 1rem; }
 
     .form-group label {
       display: block;
-      font-size: .72rem;
-      font-weight: 500;
-      letter-spacing: .1em;
+      font-family: var(--ff-cond);
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .2em;
       text-transform: uppercase;
-      color: var(--espresso);
-      opacity: .6;
+      color: var(--white);
+      opacity: .5;
       margin-bottom: .4rem;
     }
 
     .form-group input,
     .form-group select {
       width: 100%;
-      padding: .75rem 1rem;
-      border: 1px solid var(--sand);
-      border-radius: 2px;
-      background: var(--cream);
-      font-family: var(--ff-sans);
+      padding: .85rem 1rem;
+      background: var(--black);
+      border: 1px solid var(--gray-lt);
+      color: var(--white);
+      font-family: var(--ff-body);
       font-size: .9rem;
-      color: var(--espresso);
       outline: none;
       transition: border-color .2s, box-shadow .2s;
       -webkit-appearance: none;
+      border-radius: 0;
     }
+
+    .form-group input::placeholder { color: rgba(255,255,255,.2); }
 
     .form-group input:focus,
     .form-group select:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(184,151,90,.12);
-      background: var(--white);
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(214,40,40,.15);
     }
 
-    .form-group input.error,
-    .form-group select.error {
-      border-color: var(--error);
-    }
+    .form-group input.error { border-color: var(--red); }
 
     .field-error {
-      font-size: .75rem;
-      color: var(--error);
+      font-size: .72rem;
+      color: #ff8080;
       margin-top: .3rem;
       display: none;
     }
@@ -262,11 +738,9 @@
       gap: .75rem;
     }
 
-    /* ── TCPA consent ────────────────────────────────────────── */
     .consent-block {
-      background: var(--cream);
-      border: 1px solid var(--sand);
-      border-radius: 2px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--gray-lt);
       padding: 1rem;
       margin: 1.25rem 0;
     }
@@ -280,233 +754,129 @@
     .consent-item:last-child { margin-bottom: 0; }
 
     .consent-item input[type="checkbox"] {
-      width: 16px; height: 16px;
+      width: 14px; height: 14px;
       margin-top: 2px;
       flex-shrink: 0;
-      accent-color: var(--gold);
-      cursor: pointer;
+      accent-color: var(--red);
     }
 
     .consent-item label {
-      font-size: .75rem;
+      font-size: .73rem;
       line-height: 1.55;
-      color: var(--espresso);
-      opacity: .7;
-      cursor: pointer;
+      color: var(--white);
+      opacity: .5;
       text-transform: none;
       letter-spacing: 0;
       font-weight: 400;
+      font-family: var(--ff-body);
     }
 
-    .consent-item label strong { font-weight: 500; opacity: 1; }
-
-    /* ── Submit button ───────────────────────────────────────── */
     .btn-submit {
       width: 100%;
-      padding: .9rem 1.5rem;
-      background: var(--espresso);
-      color: var(--cream);
+      padding: 1rem;
+      background: var(--red);
+      color: var(--white);
       border: none;
-      border-radius: 2px;
-      font-family: var(--ff-sans);
-      font-size: .8rem;
-      font-weight: 500;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background .25s, transform .15s;
+      font-family: var(--ff-display);
+      font-size: 1.3rem;
+      letter-spacing: .08em;
+      cursor: none;
+      transition: background .2s, transform .1s;
       position: relative;
       overflow: hidden;
     }
 
-    .btn-submit:hover { background: #3d2b1a; }
-    .btn-submit:active { transform: scale(.99); }
-    .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
-
-    .btn-submit .btn-text { transition: opacity .2s; }
-    .btn-submit .btn-loader {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity .2s;
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--white);
+      transform: translateX(-101%);
+      transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
+    .btn-submit:hover::before { transform: translateX(0); }
+    .btn-submit:hover { color: var(--red); }
+    .btn-submit:active { transform: scale(.99); }
+    .btn-submit:disabled { opacity: .5; }
+
+    .btn-submit .btn-text,
+    .btn-submit .btn-loader {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-submit .btn-loader {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity .2s;
+      z-index: 1;
+    }
+
     .btn-submit.loading .btn-text { opacity: 0; }
     .btn-submit.loading .btn-loader { opacity: 1; }
 
     .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(247,243,238,.3);
-      border-top-color: var(--cream);
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: var(--white);
       border-radius: 50%;
       animation: spin .7s linear infinite;
     }
 
     .form-note {
-      font-size: .7rem;
-      color: var(--espresso);
-      opacity: .4;
+      font-size: .68rem;
+      color: var(--white);
+      opacity: .25;
       text-align: center;
       margin-top: .75rem;
       line-height: 1.5;
+      font-family: var(--ff-cond);
+      letter-spacing: .05em;
     }
 
-    /* ── Success state ───────────────────────────────────────── */
+    /* ── Success ─────────────────────────────────────────────── */
     .success-state {
       display: none;
       text-align: center;
-      padding: 2rem 1rem;
+      padding: 3rem 1rem;
     }
-
     .success-state.visible { display: block; }
 
     .success-icon {
-      width: 52px; height: 52px;
-      background: var(--success);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1.25rem;
-    }
-
-    .success-icon svg { width: 24px; height: 24px; color: white; }
-
-    .success-state h3 {
-      font-family: var(--ff-serif);
-      font-size: 1.6rem;
-      font-weight: 400;
-      margin-bottom: .5rem;
-    }
-
-    .success-state p {
-      font-size: .88rem;
-      opacity: .6;
-      line-height: 1.6;
-    }
-
-    /* ── Global error ────────────────────────────────────────── */
-    .global-error {
-      background: #fdf0ef;
-      border: 1px solid #f5c6c2;
-      border-radius: 2px;
-      padding: .75rem 1rem;
-      font-size: .8rem;
-      color: var(--error);
-      margin-bottom: 1rem;
-      display: none;
-    }
-    .global-error.visible { display: block; }
-
-    /* ── Social proof strip ──────────────────────────────────── */
-    .proof {
-      background: var(--espresso);
-      color: var(--cream);
-      padding: 2.5rem 3rem;
+      width: 56px; height: 56px;
+      border: 2px solid var(--red);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4rem;
-      flex-wrap: wrap;
+      margin: 0 auto 1.5rem;
     }
 
-    .proof-stat {
-      text-align: center;
-    }
+    .success-icon svg { width: 24px; height: 24px; color: var(--red); }
 
-    .proof-stat__number {
-      font-family: var(--ff-serif);
-      font-size: 2.4rem;
-      font-weight: 300;
-      color: var(--gold-lt);
-      line-height: 1;
-      display: block;
-    }
-
-    .proof-stat__label {
-      font-size: .72rem;
-      font-weight: 500;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-      opacity: .5;
-      margin-top: .3rem;
-      display: block;
-    }
-
-    .proof-divider {
-      width: 1px;
-      height: 40px;
-      background: rgba(247,243,238,.15);
-    }
-
-    /* ── Benefits section ────────────────────────────────────── */
-    .benefits {
-      padding: 6rem 3rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .section-label {
-      font-size: .72rem;
-      font-weight: 500;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 1rem;
-    }
-
-    .section-title {
-      font-family: var(--ff-serif);
-      font-size: clamp(2rem, 3.5vw, 3rem);
-      font-weight: 300;
-      line-height: 1.15;
-      color: var(--espresso);
-      max-width: 26ch;
-      margin-bottom: 3.5rem;
-    }
-
-    .benefits-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-    }
-
-    .benefit-card {
-      padding: 2rem;
-      border: 1px solid var(--sand);
-      border-radius: 2px;
-      background: var(--white);
-      transition: box-shadow .3s, transform .3s;
-    }
-
-    .benefit-card:hover {
-      box-shadow: 0 12px 40px rgba(44,31,20,.07);
-      transform: translateY(-3px);
-    }
-
-    .benefit-number {
-      font-family: var(--ff-serif);
-      font-size: 3rem;
-      font-weight: 300;
-      color: var(--sand);
-      line-height: 1;
-      margin-bottom: .75rem;
-    }
-
-    .benefit-title {
-      font-family: var(--ff-serif);
-      font-size: 1.2rem;
-      font-weight: 400;
+    .success-state h3 {
+      font-family: var(--ff-display);
+      font-size: 2.5rem;
+      color: var(--white);
       margin-bottom: .5rem;
+      letter-spacing: .03em;
     }
 
-    .benefit-text {
-      font-size: .84rem;
+    .success-state p {
+      font-size: .85rem;
+      opacity: .5;
       line-height: 1.7;
-      opacity: .6;
     }
 
     /* ── Footer ──────────────────────────────────────────────── */
     footer {
-      background: var(--espresso);
-      color: var(--cream);
-      padding: 2rem 3rem;
+      background: var(--gray);
+      border-top: 1px solid var(--gray-lt);
+      padding: 2.5rem 3rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -514,393 +884,574 @@
       gap: 1rem;
     }
 
-    footer .logo { color: var(--cream); }
+    .footer__logo {
+      font-family: var(--ff-display);
+      font-size: 1.4rem;
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: .05em;
+    }
+
+    .footer__logo span { color: var(--red); }
 
     footer p {
-      font-size: .72rem;
-      opacity: .4;
+      font-size: .7rem;
+      color: var(--white);
+      opacity: .25;
       line-height: 1.6;
-      max-width: 60ch;
+      max-width: 50ch;
     }
 
     /* ── Animations ──────────────────────────────────────────── */
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
+    /* ── Scroll reveal ───────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .8s ease, transform .8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Calendly CTA button ─────────────────────────────────── */
+    .btn-calendly {
+      font-family: var(--ff-display);
+      font-size: 1.4rem;
+      letter-spacing: .08em;
+      color: var(--black);
+      background: var(--white);
+      border: none;
+      padding: 1.1rem 3rem;
+      cursor: none;
+      position: relative;
+      overflow: hidden;
+      transition: color .3s;
+    }
+    .btn-calendly::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--red);
+      transform: translateX(-101%);
+      transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-calendly:hover::before { transform: translateX(0); }
+    .btn-calendly:hover { color: var(--white); }
+    .btn-calendly span { position: relative; z-index: 1; }
+
     /* ── Responsive ──────────────────────────────────────────── */
     @media (max-width: 900px) {
-      header { padding: 1rem 1.5rem; }
-      nav { display: none; }
+      nav { padding: 1rem 1.5rem; }
+      * { cursor: auto !important; }
+      #cursor, #cursor-dot { display: none; }
 
-      .hero {
-        grid-template-columns: 1fr;
-        min-height: auto;
-      }
+      .hero__content { padding: 7rem 1.5rem 2rem; }
+      .hero__side { display: none; }
+      .hero__bottom { flex-direction: column; align-items: flex-start; }
 
-      .hero__visual {
-        height: 280px;
-      }
+      .problem { grid-template-columns: 1fr; padding: 4rem 1.5rem; }
+      .how { padding: 4rem 1.5rem; }
+      .how__header { flex-direction: column; align-items: flex-start; }
+      .how__sub { text-align: left; }
+      .how__steps { grid-template-columns: 1fr; }
 
-      .hero__visual::after {
-        background: linear-gradient(to bottom, transparent 60%, var(--cream) 100%);
-      }
-
-      .hero__content {
-        padding: 2.5rem 1.5rem 3rem;
-      }
-
-      .form-card { max-width: 100%; }
+      .form-section { grid-template-columns: 1fr; padding: 4rem 1.5rem; gap: 3rem; }
       .form-row { grid-template-columns: 1fr; }
 
-      .proof {
-        padding: 2rem 1.5rem;
-        gap: 2rem;
-      }
-      .proof-divider { display: none; }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
 
-      .benefits {
-        padding: 4rem 1.5rem;
-      }
-
-      .benefits-grid {
-        grid-template-columns: 1fr;
-      }
-
-      footer {
-        padding: 1.5rem;
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      .scroll-hint { padding: 1.5rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ── Header ──────────────────────────────────────────────── -->
-  <header>
-    <a href="#" class="logo">Luxe <span>Med Spa</span></a>
-    <nav>
-      <a href="#treatments">Treatments</a>
-      <a href="#about">About</a>
-      <a href="#form-section">Book Free Consult</a>
-    </nav>
-  </header>
+  <!-- Custom cursor -->
+  <div id="cursor">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Scissors icon -->
+      <circle cx="10" cy="10" r="4" stroke="white" stroke-width="1.5"/>
+      <circle cx="22" cy="10" r="4" stroke="white" stroke-width="1.5"/>
+      <line x1="13.5" y1="12.5" x2="24" y2="26" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="18.5" y1="12.5" x2="8" y2="26" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="13.5" y1="12.5" x2="18.5" y2="12.5" stroke="white" stroke-width="1.5"/>
+    </svg>
+  </div>
+  <div id="cursor-dot"></div>
 
-  <!-- ── Hero ────────────────────────────────────────────────── -->
-  <section class="hero" id="form-section">
-    <div class="hero__visual" role="img" aria-label="Luxurious med spa treatment room"></div>
-
-    <div class="hero__content">
-      <p class="hero__eyebrow">Miami's Premier Medical Spa</p>
-
-      <h1 class="hero__title">
-        Look &amp; Feel<br>
-        <em>Effortlessly</em> You.
-      </h1>
-
-      <p class="hero__sub">
-        Science-backed treatments, personalized care. Book your free consultation and discover what's possible for your skin and confidence.
-      </p>
-
-      <div class="hero__badges">
-        <span class="badge">Board-Certified Practitioners</span>
-        <span class="badge">FDA-Approved Treatments</span>
-        <span class="badge">Same-Week Appointments</span>
-      </div>
-
-      <!-- ── Lead Form ── -->
-      <div class="form-card" role="main">
-        <h2 class="form-card__title">Book Your Free Consultation</h2>
-        <p class="form-card__sub">No commitment. No pressure. Just honest advice from our specialists.</p>
-
-        <div class="global-error" id="globalError" role="alert"></div>
-
-        <form id="leadForm" novalidate>
-          <!-- Hidden UTM tracking -->
-          <input type="hidden" id="utm_source" name="utm_source" />
-          <input type="hidden" id="utm_medium" name="utm_medium" />
-          <input type="hidden" id="utm_campaign" name="utm_campaign" />
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="full_name">Full Name *</label>
-              <input type="text" id="full_name" name="full_name"
-                placeholder="Amanda Torres"
-                autocomplete="name" required />
-              <span class="field-error" id="err_full_name">Please enter your full name.</span>
-            </div>
-            <div class="form-group">
-              <label for="email">Email *</label>
-              <input type="email" id="email" name="email"
-                placeholder="amanda@email.com"
-                autocomplete="email" required />
-              <span class="field-error" id="err_email">Please enter a valid email.</span>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="phone">Phone *</label>
-              <input type="tel" id="phone" name="phone"
-                placeholder="(305) 555-0100"
-                autocomplete="tel" required />
-              <span class="field-error" id="err_phone">Please enter a valid US phone number.</span>
-            </div>
-            <div class="form-group">
-              <label for="interest">I'm interested in</label>
-              <select id="interest" name="interest">
-                <option value="">Select treatment...</option>
-                <option value="botox">Botox / Dysport</option>
-                <option value="filler">Dermal Fillers</option>
-                <option value="laser">Laser Treatments</option>
-                <option value="skin">Skin Rejuvenation</option>
-                <option value="body">Body Contouring</option>
-                <option value="other">Not sure yet</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- TCPA Consent (legally required for US SMS/email marketing) -->
-          <div class="consent-block">
-            <div class="consent-item">
-              <input type="checkbox" id="sms_consent" name="sms_consent" checked />
-              <label for="sms_consent">
-                <strong>SMS Updates:</strong> I agree to receive text messages from Luxe Med Spa about my appointment, specials, and follow-up care. Message &amp; data rates may apply. Reply STOP to opt out at any time.
-              </label>
-            </div>
-            <div class="consent-item">
-              <input type="checkbox" id="email_consent" name="email_consent" checked />
-              <label for="email_consent">
-                <strong>Email Updates:</strong> I agree to receive emails from Luxe Med Spa. You can unsubscribe at any time.
-              </label>
-            </div>
-          </div>
-          <span class="field-error" id="err_consent" style="margin-top:-.5rem; margin-bottom:.75rem;">Please accept both SMS and Email consent to continue.</span>
-
-          <button type="submit" class="btn-submit" id="submitBtn">
-            <span class="btn-text">Request My Free Consultation →</span>
-            <span class="btn-loader" aria-hidden="true">
-              <span class="spinner"></span>
-            </span>
-          </button>
-
-          <p class="form-note">🔒 Your information is private and never sold to third parties.</p>
-        </form>
-
-        <!-- Success state -->
-        <div class="success-state" id="successState">
-          <div class="success-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
-          </div>
-          <h3>You're on the list!</h3>
-          <p>We'll reach out within <strong>24 hours</strong> to confirm your free consultation. Check your email for details.</p>
-        </div>
-      </div><!-- /.form-card -->
-
-    </div><!-- /.hero__content -->
-  </section>
-
-  <!-- ── Social proof ─────────────────────────────────────────── -->
-  <div class="proof">
-    <div class="proof-stat">
-      <span class="proof-stat__number">2,400+</span>
-      <span class="proof-stat__label">Happy clients</span>
-    </div>
-    <div class="proof-divider"></div>
-    <div class="proof-stat">
-      <span class="proof-stat__number">98%</span>
-      <span class="proof-stat__label">Satisfaction rate</span>
-    </div>
-    <div class="proof-divider"></div>
-    <div class="proof-stat">
-      <span class="proof-stat__number">12+</span>
-      <span class="proof-stat__label">Years in Miami</span>
-    </div>
-    <div class="proof-divider"></div>
-    <div class="proof-stat">
-      <span class="proof-stat__number">Free</span>
-      <span class="proof-stat__label">First consultation</span>
+  <!-- Ticker -->
+  <div class="ticker" role="marquee">
+    <div class="ticker__track">
+      <!-- First copy -->
+      <span class="ticker__item">Book Online Now <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Walk-ins Welcome <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Miami's Sharpest Cuts <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Same-Day Appointments <span class="ticker__dot"></span></span>
+      <span class="ticker__item">No Waiting. No Missed Calls. <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Book Online Now <span class="ticker__dot"></span></span>
+      <!-- Duplicate for seamless loop -->
+      <span class="ticker__item">Book Online Now <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Walk-ins Welcome <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Miami's Sharpest Cuts <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Same-Day Appointments <span class="ticker__dot"></span></span>
+      <span class="ticker__item">No Waiting. No Missed Calls. <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Book Online Now <span class="ticker__dot"></span></span>
     </div>
   </div>
 
-  <!-- ── Benefits ─────────────────────────────────────────────── -->
-  <section class="benefits" id="treatments">
-    <p class="section-label">Why choose us</p>
-    <h2 class="section-title">A Different Kind of Med Spa Experience</h2>
+  <!-- Nav -->
+  <nav>
+    <a href="#" class="nav__logo">Kingdom <span>Cuts</span></a>
+    <a href="#book" class="nav__cta">Book Now</a>
+  </nav>
 
-    <div class="benefits-grid">
-      <div class="benefit-card">
-        <div class="benefit-number">01</div>
-        <h3 class="benefit-title">Honest consultations</h3>
-        <p class="benefit-text">We'll tell you exactly what we think will work for you — and what won't. No upselling, no pressure.</p>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__bg"></div>
+    <div class="hero__side">Est. 2018 — Miami, Florida — Kingdom Cuts Barbershop</div>
+
+    <div class="hero__content">
+      <p class="hero__issue">Miami's Premier Barbershop</p>
+      <h1 class="hero__title">
+        SHARP<br>
+        <span class="outline">CUTS.</span><br>
+        <span class="red">ZERO</span><br>
+        WAIT.
+      </h1>
+      <div class="hero__bottom">
+        <p class="hero__sub">
+          Stop DMing and never hearing back. Book your cut online in 60 seconds — instant confirmation, no calls needed.
+        </p>
+        <div class="stat-box">
+          <span class="stat-box__num" id="lostLeads">0</span>
+          <span class="stat-box__label">Leads lost today<br>by slow response</span>
+        </div>
       </div>
-      <div class="benefit-card">
-        <div class="benefit-number">02</div>
-        <h3 class="benefit-title">Board-certified team</h3>
-        <p class="benefit-text">Every treatment is performed or supervised by a licensed medical professional. Your safety is non-negotiable.</p>
+    </div>
+
+    <div class="scroll-hint">
+      <div class="scroll-hint__line"></div>
+      <span class="scroll-hint__text">Scroll to book</span>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section class="problem">
+    <div class="problem__left reveal">
+      <p class="section-tag">The real problem</p>
+      <h2 class="problem__title">
+        YOU'RE<br>
+        <span class="outline">LOSING</span><br>
+        CLIENTS<br>
+        DAILY.
+      </h2>
+    </div>
+    <div class="problem__right reveal">
+      <div class="problem__stat">
+        <div class="problem__stat-num">78%</div>
+        <div class="problem__stat-text">
+          <div class="problem__stat-title">Go to the first to respond</div>
+          <div class="problem__stat-desc">When someone DMs multiple barbers, they book with whoever replies first. Speed wins every time.</div>
+        </div>
       </div>
-      <div class="benefit-card">
-        <div class="benefit-number">03</div>
-        <h3 class="benefit-title">Results that last</h3>
-        <p class="benefit-text">We focus on natural, long-lasting outcomes — not dramatic changes that fade in weeks. Real results for real life.</p>
+      <div class="problem__stat">
+        <div class="problem__stat-num">5min</div>
+        <div class="problem__stat-text">
+          <div class="problem__stat-title">The response window</div>
+          <div class="problem__stat-desc">After 5 minutes, the chance of booking drops by 80%. After an hour? They've already booked somewhere else.</div>
+        </div>
+      </div>
+      <div class="problem__stat">
+        <div class="problem__stat-num">$0</div>
+        <div class="problem__stat-text">
+          <div class="problem__stat-title">Cost to fix it</div>
+          <div class="problem__stat-desc">Your first consultation is free. No setup fees, no contracts. Just more clients in your chair.</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ── Footer ──────────────────────────────────────────────── -->
+  <!-- How it works -->
+  <section class="how" id="how">
+    <div class="how__header reveal">
+      <h2 class="how__title">
+        HOW IT<br>WORKS.
+      </h2>
+      <p class="how__sub">Three steps. Under 60 seconds. You'll wonder why you didn't do this sooner.</p>
+    </div>
+
+    <div class="how__steps reveal">
+      <div class="how__step">
+        <div class="how__step-num">01</div>
+        <div class="how__step-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+          </svg>
+        </div>
+        <div class="how__step-title">Client clicks your link</div>
+        <div class="how__step-desc">They see your booking page — clean, fast, mobile-first. Takes 60 seconds to fill out.</div>
+        <div class="how__time">⚡ Instant</div>
+      </div>
+
+      <div class="how__step">
+        <div class="how__step-num">02</div>
+        <div class="how__step-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+          </svg>
+        </div>
+        <div class="how__step-title">They get a confirmation</div>
+        <div class="how__step-desc">Automatic text + email confirmation within 2 minutes. They know they're booked. You know you've got a client.</div>
+        <div class="how__time">⚡ Under 2 minutes</div>
+      </div>
+
+      <div class="how__step">
+        <div class="how__step-num">03</div>
+        <div class="how__step-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <div class="how__step-title">You focus on the cut</div>
+        <div class="how__step-desc">No more checking DMs between clients. No missed calls. Just a full calendar and clients who show up.</div>
+        <div class="how__time">⚡ Zero extra work</div>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-top:3rem;text-align:center;">
+      <button class="btn-calendly" onclick="openCalendly()">
+        BOOK YOUR CUT NOW →
+      </button>
+      <p style="font-family:var(--ff-cond);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-top:.75rem;">Free. No commitment. Pick your exact time.</p>
+    </div>
+  </section>
+
+  <!-- Form -->
+  <section class="form-section" id="book">
+    <div class="form-left">
+      <p class="section-tag form-left__tag">Book your cut</p>
+      <h2 class="form-left__title">
+        CLAIM YOUR<br>
+        <span class="outline">FREE</span><br>
+        CONSULT.
+      </h2>
+      <p class="form-left__desc">
+        Tell us what you're looking for and we'll reach out within 2 hours to confirm your appointment. No commitment, no pressure.
+      </p>
+      <div class="proof-items">
+        <div class="proof-item">Instant text + email confirmation</div>
+        <div class="proof-item">Same-week appointments available</div>
+        <div class="proof-item">No cancellation fees</div>
+        <div class="proof-item">Walk-ins always welcome</div>
+      </div>
+    </div>
+
+    <div class="form-card reveal">
+      <h3 class="form-card__title">Book Your Spot</h3>
+      <p class="form-card__sub">We'll confirm within 2 hours. Usually much faster.</p>
+
+      <div class="global-error" id="globalError" role="alert"></div>
+
+      <form id="leadForm" novalidate>
+        <input type="hidden" id="utm_source" name="utm_source" />
+        <input type="hidden" id="utm_medium" name="utm_medium" />
+        <input type="hidden" id="utm_campaign" name="utm_campaign" />
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="full_name">Your Name *</label>
+            <input type="text" id="full_name" name="full_name"
+              placeholder="Marcus Johnson"
+              autocomplete="name" required />
+            <span class="field-error" id="err_full_name">Enter your full name.</span>
+          </div>
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email"
+              placeholder="marcus@email.com"
+              autocomplete="email" required />
+            <span class="field-error" id="err_email">Enter a valid email.</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Phone *</label>
+            <input type="tel" id="phone" name="phone"
+              placeholder="(305) 555-0100"
+              autocomplete="tel" required />
+            <span class="field-error" id="err_phone">Enter a valid US phone number.</span>
+          </div>
+          <div class="form-group">
+            <label for="interest">What do you need?</label>
+            <select id="interest" name="interest">
+              <option value="">Select service...</option>
+              <option value="haircut">Haircut</option>
+              <option value="beard">Beard Trim</option>
+              <option value="haircut_beard">Haircut + Beard</option>
+              <option value="fade">Fade</option>
+              <option value="lineup">Line-up</option>
+              <option value="other">Not sure yet</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="consent-block">
+          <div class="consent-item">
+            <input type="checkbox" id="sms_consent" name="sms_consent" checked />
+            <label for="sms_consent">
+              <strong style="color:rgba(255,255,255,.8)">Text me:</strong> I agree to receive text messages about my appointment. Reply STOP to opt out anytime.
+            </label>
+          </div>
+          <div class="consent-item">
+            <input type="checkbox" id="email_consent" name="email_consent" checked />
+            <label for="email_consent">
+              <strong style="color:rgba(255,255,255,.8)">Email me:</strong> I agree to receive emails about my booking. Unsubscribe anytime.
+            </label>
+          </div>
+        </div>
+        <span class="field-error" id="err_consent" style="margin-bottom:.75rem;">Please accept at least one contact method.</span>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span class="btn-text">LOCK IN MY SPOT →</span>
+          <span class="btn-loader"><span class="spinner"></span></span>
+        </button>
+
+        <p class="form-note">🔒 Your info stays private. We don't sell or share it.</p>
+      </form>
+
+      <div class="success-state" id="successState">
+        <div class="success-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+        <h3>YOU'RE IN.</h3>
+        <p>Check your phone — confirmation text coming within 2 minutes. See you in the chair.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Calendly Modal -->
+  <div class="calendly-overlay" id="calendlyOverlay" onclick="closeCalendlyOnBg(event)">
+    <div class="calendly-modal">
+      <div class="calendly-modal__header">
+        <div class="calendly-modal__title">BOOK YOUR <span>CUT</span></div>
+        <button class="calendly-modal__close" onclick="closeCalendly()" aria-label="Close">✕</button>
+      </div>
+      <div class="calendly-modal__body">
+        <div class="calendly-inline-widget" id="calendlyWidget" data-auto-load="false"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
   <footer>
-    <a href="#" class="logo">Luxe <span>Med Spa</span></a>
-    <p>
-      © 2026 Luxe Med Spa, Miami FL. By submitting this form you agree to our
-      <a href="#" style="color:var(--gold-lt);opacity:1">Privacy Policy</a> and
-      <a href="#" style="color:var(--gold-lt);opacity:1">Terms of Service</a>.
-      SMS messages are sent only with your explicit consent (TCPA compliant).
-    </p>
+    <a href="#" class="footer__logo">Kingdom <span>Cuts</span></a>
+    <p>© 2026 Kingdom Cuts, Miami FL. SMS sent only with consent (TCPA compliant). <a href="#" style="color:rgba(255,255,255,.4)">Privacy Policy</a></p>
   </footer>
 
   <script>
     // ── Config ────────────────────────────────────────────────
-    // Replace with your Railway API URL and the Business ID from the seed.
     const API_URL     = 'https://vitrineia-us-production.up.railway.app/api/leads';
     const BUSINESS_ID = '8308b000-eb0d-4ac4-a6ad-1e3ca9399936';
 
+    // ── Custom cursor ─────────────────────────────────────────
+    const cursor    = document.getElementById('cursor');
+    const cursorDot = document.getElementById('cursor-dot');
+
+    document.addEventListener('mousemove', e => {
+      cursor.style.left    = e.clientX + 'px';
+      cursor.style.top     = e.clientY + 'px';
+      cursorDot.style.left = e.clientX + 'px';
+      cursorDot.style.top  = e.clientY + 'px';
+    });
+
+    // ── Lost leads counter ────────────────────────────────────
+    // Simulates leads lost today based on time of day
+    function updateLostLeads() {
+      const now   = new Date();
+      const mins  = now.getHours() * 60 + now.getMinutes();
+      const lost  = Math.floor(mins / 12); // ~5 lost per hour
+      document.getElementById('lostLeads').textContent = lost;
+    }
+    updateLostLeads();
+    setInterval(updateLostLeads, 60000);
+
     // ── UTM tracking ─────────────────────────────────────────
-    (function captureUTM() {
-      const params = new URLSearchParams(window.location.search);
-      ['utm_source', 'utm_medium', 'utm_campaign'].forEach(key => {
-        const el = document.getElementById(key);
-        if (el && params.get(key)) el.value = params.get(key);
+    (function() {
+      const p = new URLSearchParams(window.location.search);
+      ['utm_source', 'utm_medium', 'utm_campaign'].forEach(k => {
+        const el = document.getElementById(k);
+        if (el && p.get(k)) el.value = p.get(k);
       });
-      // Fallback: detect source from referrer
-      if (!params.get('utm_source')) {
+      const src = document.getElementById('utm_source');
+      if (src && !src.value) {
         const ref = document.referrer;
-        const src = document.getElementById('utm_source');
-        if (src) {
-          if (ref.includes('instagram.com')) src.value = 'instagram';
-          else if (ref.includes('google.com'))   src.value = 'google';
-          else if (ref.includes('facebook.com')) src.value = 'facebook';
-          else if (ref)                          src.value = 'referral';
-          else                                   src.value = 'direct';
-        }
+        if (ref.includes('instagram.com'))    src.value = 'instagram';
+        else if (ref.includes('google.com'))  src.value = 'google';
+        else if (ref)                         src.value = 'referral';
+        else                                  src.value = 'direct';
       }
     })();
 
-    // ── Phone formatting ─────────────────────────────────────
+    // ── Phone formatting ──────────────────────────────────────
     document.getElementById('phone').addEventListener('input', function() {
-      let v = this.value.replace(/\D/g, '');
-      if (v.length >= 10) {
-        v = v.slice(-10);
-        this.value = `(${v.slice(0,3)}) ${v.slice(3,6)}-${v.slice(6)}`;
-      }
+      let v = this.value.replace(/\D/g, '').slice(-10);
+      if (v.length >= 6) this.value = `(${v.slice(0,3)}) ${v.slice(3,6)}-${v.slice(6)}`;
+      else if (v.length >= 3) this.value = `(${v.slice(0,3)}) ${v.slice(3)}`;
     });
 
-    // ── Helpers ───────────────────────────────────────────────
+    // ── Scroll reveal ─────────────────────────────────────────
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: .15 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ── Validation ────────────────────────────────────────────
+    function showErr(fieldId, errId, show) {
+      const f = document.getElementById(fieldId);
+      const e = document.getElementById(errId);
+      if (f) f.classList.toggle('error', show);
+      if (e) e.classList.toggle('visible', show);
+    }
+
+    function validate(data) {
+      let ok = true;
+      if (data.full_name.trim().length < 2) { showErr('full_name','err_full_name',true); ok=false; } else showErr('full_name','err_full_name',false);
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) { showErr('email','err_email',true); ok=false; } else showErr('email','err_email',false);
+      const d = data.phone.replace(/\D/g,'');
+      if (d.length < 10) { showErr('phone','err_phone',true); ok=false; } else showErr('phone','err_phone',false);
+      const c = data.sms_consent || data.email_consent;
+      document.getElementById('err_consent').classList.toggle('visible',!c);
+      if (!c) ok=false;
+      return ok;
+    }
+
     function toE164(phone) {
-      const digits = phone.replace(/\D/g, '');
-      // Handle 10-digit US numbers
-      return digits.length === 10 ? `+1${digits}` : `+${digits}`;
+      const d = phone.replace(/\D/g,'');
+      return d.length === 10 ? `+1${d}` : `+${d}`;
     }
 
-    function showFieldError(fieldId, errorId, show) {
-      const field = document.getElementById(fieldId);
-      const error = document.getElementById(errorId);
-      if (!field || !error) return;
-      field.classList.toggle('error', show);
-      error.classList.toggle('visible', show);
-    }
-
-    function validateForm(data) {
-      let valid = true;
-
-      // Name
-      const nameOk = data.full_name.trim().length >= 2;
-      showFieldError('full_name', 'err_full_name', !nameOk);
-      if (!nameOk) valid = false;
-
-      // Email
-      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
-      showFieldError('email', 'err_email', !emailOk);
-      if (!emailOk) valid = false;
-
-      // Phone (must resolve to 10 US digits)
-      const digits = data.phone.replace(/\D/g, '');
-      const phoneOk = digits.length === 10 || (digits.length === 11 && digits[0] === '1');
-      showFieldError('phone', 'err_phone', !phoneOk);
-      if (!phoneOk) valid = false;
-
-      // Consent (at least one required)
-      const consentOk = data.sms_consent && data.email_consent;
-      const consentErr = document.getElementById('err_consent');
-      if (consentErr) consentErr.classList.toggle('visible', !consentOk);
-      if (!consentOk) valid = false;
-
-      return valid;
-    }
-
-    // ── Form submission ───────────────────────────────────────
+    // ── Submit ────────────────────────────────────────────────
     document.getElementById('leadForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-
-      const form = e.target;
-      const btn  = document.getElementById('submitBtn');
+      const btn      = document.getElementById('submitBtn');
       const globalErr = document.getElementById('globalError');
 
       const data = {
-        full_name:     form.full_name.value.trim(),
-        email:         form.email.value.trim().toLowerCase(),
-        phone:         form.phone.value,
-        sms_consent:   form.sms_consent.checked,
-        email_consent: form.email_consent.checked,
+        full_name:     this.full_name.value.trim(),
+        email:         this.email.value.trim().toLowerCase(),
+        phone:         this.phone.value,
+        sms_consent:   this.sms_consent.checked,
+        email_consent: this.email_consent.checked,
         business_id:   BUSINESS_ID,
         source:        document.getElementById('utm_source').value || 'organic',
-        notes:         form.interest.value ? `Interest: ${form.interest.value}` : null,
+        notes:         this.interest.value ? `Interest: ${this.interest.value}` : null,
       };
 
-      // Client-side validation
-      if (!validateForm(data)) return;
-
-      // Convert phone to E.164
+      if (!validate(data)) return;
       data.phone = toE164(data.phone);
 
-      // Loading state
       btn.disabled = true;
       btn.classList.add('loading');
       globalErr.classList.remove('visible');
 
       try {
-        const res = await fetch(API_URL, {
+        const res  = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
-
         const json = await res.json();
 
         if (res.ok || res.status === 409) {
-          // 409 = already registered, still show success (idempotent UX)
-          form.style.display = 'none';
+          this.style.display = 'none';
           document.getElementById('successState').classList.add('visible');
-
-          // Fire simple analytics event (if gtag loaded)
-          if (typeof gtag !== 'undefined') {
-            gtag('event', 'lead_submitted', { event_category: 'engagement' });
-          }
+          if (typeof gtag !== 'undefined') gtag('event','lead_submitted',{event_category:'engagement'});
         } else {
           throw new Error(json.error || 'Something went wrong. Please try again.');
         }
-
       } catch (err) {
         globalErr.textContent = err.message;
         globalErr.classList.add('visible');
         btn.disabled = false;
         btn.classList.remove('loading');
+      }
+    });
+  </script>
+
+  <!-- Calendly widget -->
+  <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+
+  <script>
+    // ── Calendly config ───────────────────────────────────────
+    // Replace with your Calendly event URL after creating account
+    const CALENDLY_URL = 'https://calendly.com/YOUR_USERNAME/haircut-consultation';
+
+    let calendlyLoaded = false;
+
+    function openCalendly() {
+      document.getElementById('calendlyOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      if (!calendlyLoaded) {
+        Calendly.initInlineWidget({
+          url: CALENDLY_URL,
+          parentElement: document.getElementById('calendlyWidget'),
+          prefill: {},
+          utm: {
+            utmSource:   document.getElementById('utm_source')?.value || 'landing',
+            utmMedium:   document.getElementById('utm_medium')?.value || 'barber',
+            utmCampaign: document.getElementById('utm_campaign')?.value || 'booking',
+          },
+        });
+        calendlyLoaded = true;
+      }
+    }
+
+    function closeCalendly() {
+      document.getElementById('calendlyOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function closeCalendlyOnBg(e) {
+      if (e.target === document.getElementById('calendlyOverlay')) closeCalendly();
+    }
+
+    // Close on Escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeCalendly();
+    });
+
+    // Listen for Calendly booking completion
+    window.addEventListener('message', function(e) {
+      if (e.data.event && e.data.event.indexOf('calendly') === 0) {
+        if (e.data.event === 'calendly.event_scheduled') {
+          closeCalendly();
+          // Show success message
+          setTimeout(() => {
+            document.getElementById('leadForm').style.display = 'none';
+            document.getElementById('successState').classList.add('visible');
+            document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
+          }, 800);
+        }
       }
     });
   </script>
