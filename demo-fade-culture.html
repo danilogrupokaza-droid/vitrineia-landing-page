@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fade Culture Barbershop — Wynwood, Miami</title>
+  <meta name="description" content="Wynwood's most sought-after barbershop. Precision fades, straight razor shaves, walk-ins welcome. Book your spot online — confirmed in 2 minutes." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,700;1,300&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- Calendly -->
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --black:    #060606;
+      --off:      #0E0E0E;
+      --white:    #F0EDE8;
+      --red:      #C8202F;
+      --gold:     #BFA14A;
+      --gray:     #161616;
+      --gray-lt:  #252525;
+      --sub:      rgba(240,237,232,.45);
+      --ff-disp:  'Bebas Neue', sans-serif;
+      --ff-cond:  'Barlow Condensed', sans-serif;
+      --ff-body:  'Barlow', sans-serif;
+      --ease:     cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ── Custom cursor ─────────────────────────────────────── */
+    * { cursor: none !important; }
+    #cur { position:fixed; width:28px; height:28px; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); mix-blend-mode:exclusion; transition:transform .08s; }
+    #cur-dot { position:fixed; width:5px; height:5px; background:var(--red); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:transform .04s; }
+
+    body { font-family:var(--ff-body); background:var(--black); color:var(--white); overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+
+    /* Grain */
+    body::after { content:''; position:fixed; inset:0; z-index:300; pointer-events:none; opacity:.03;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+    /* ── Demo banner ───────────────────────────────────────── */
+    .demo-banner {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 400;
+      background: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: .7rem 1.5rem;
+      flex-wrap: wrap;
+    }
+    .demo-banner__text {
+      font-family: var(--ff-cond);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+    .demo-banner__cta {
+      font-family: var(--ff-cond);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: var(--black);
+      padding: .4rem 1.2rem;
+      text-decoration: none;
+      transition: background .2s;
+      white-space: nowrap;
+    }
+    .demo-banner__cta:hover { background: var(--red); }
+
+    /* ── Ticker ────────────────────────────────────────────── */
+    .ticker { position:fixed; top:0; left:0; right:0; z-index:100; background:var(--red); height:30px; overflow:hidden; display:flex; align-items:center; }
+    .ticker__track { display:flex; white-space:nowrap; animation:tick 16s linear infinite; }
+    .ticker__item { font-family:var(--ff-cond); font-size:.7rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--white); padding:0 2.5rem; display:flex; align-items:center; gap:.75rem; }
+    .ticker__dot { width:3px; height:3px; background:rgba(255,255,255,.4); border-radius:50%; }
+    @keyframes tick { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    /* ── Nav ───────────────────────────────────────────────── */
+    nav { position:fixed; top:30px; left:0; right:0; z-index:99; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 3rem; }
+    nav::before { content:''; position:absolute; inset:0; background:linear-gradient(to bottom,rgba(6,6,6,.96) 0%,transparent 100%); pointer-events:none; }
+    .nav__logo { position:relative; z-index:1; text-decoration:none; }
+    .nav__logo-main { font-family:var(--ff-disp); font-size:1.5rem; letter-spacing:.12em; color:var(--white); display:block; line-height:1; }
+    .nav__logo-sub { font-family:var(--ff-cond); font-size:.6rem; font-weight:700; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); display:block; margin-top:1px; }
+    .nav__links { position:relative; z-index:1; display:flex; align-items:center; gap:2rem; }
+    .nav__links a { font-family:var(--ff-cond); font-size:.72rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--white); opacity:.5; text-decoration:none; transition:opacity .2s; }
+    .nav__links a:hover { opacity:1; }
+    .nav__book { font-family:var(--ff-cond); font-size:.72rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--black); background:var(--white); padding:.55rem 1.4rem; text-decoration:none; transition:background .2s, color .2s; position:relative; z-index:1; }
+    .nav__book:hover { background:var(--red); color:var(--white); }
+
+    /* ── Hero ──────────────────────────────────────────────── */
+    .hero { min-height:100vh; padding-top:30px; display:grid; grid-template-rows:1fr auto; position:relative; overflow:hidden; }
+
+    .hero__bg {
+      position:absolute; inset:0;
+      background: url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=1600&q=80') center/cover no-repeat;
+      filter:grayscale(100%) contrast(1.15) brightness(.55);
+    }
+    .hero__bg::after { content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg,rgba(6,6,6,.85) 0%,rgba(6,6,6,.3) 50%,rgba(6,6,6,.7) 100%); }
+
+    /* Decorative side number */
+    .hero__num { position:absolute; right:3rem; bottom:8rem; font-family:var(--ff-disp); font-size:18rem; color:rgba(255,255,255,.025); line-height:1; pointer-events:none; }
+
+    /* Gold accent line */
+    .hero__accent { position:absolute; left:3rem; top:35%; width:1px; height:120px; background:linear-gradient(to bottom, transparent, var(--gold), transparent); }
+
+    .hero__content { position:relative; z-index:2; display:flex; flex-direction:column; justify-content:flex-end; padding:8rem 3rem 2.5rem; }
+
+    .hero__tag { font-family:var(--ff-cond); font-size:.68rem; font-weight:700; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); margin-bottom:1.25rem; display:flex; align-items:center; gap:.75rem;
+      opacity:0; animation:up .7s var(--ease) .2s forwards; }
+    .hero__tag::before { content:''; width:20px; height:1px; background:var(--gold); }
+
+    .hero__title { font-family:var(--ff-disp); font-size:clamp(5rem,15vw,14rem); line-height:.85; letter-spacing:-.01em; margin-bottom:2rem;
+      opacity:0; animation:up .9s var(--ease) .35s forwards; }
+    .hero__title .stroke { -webkit-text-stroke:2px rgba(240,237,232,.6); color:transparent; }
+    .hero__title .gold { color:var(--gold); }
+
+    .hero__bottom { display:flex; align-items:flex-end; justify-content:space-between; gap:2rem;
+      opacity:0; animation:fadeIn .8s ease .7s forwards; }
+
+    .hero__desc { font-family:var(--ff-cond); font-size:1.05rem; font-weight:300; line-height:1.6; color:var(--white); opacity:.65; max-width:40ch; }
+
+    .hero__stats { display:flex; gap:1px; }
+    .hero__stat { background:rgba(240,237,232,.06); backdrop-filter:blur(4px); padding:1rem 1.5rem; text-align:center; border:1px solid rgba(240,237,232,.08); min-width:100px; }
+    .hero__stat-n { font-family:var(--ff-disp); font-size:2.2rem; color:var(--gold); line-height:1; display:block; }
+    .hero__stat-l { font-family:var(--ff-cond); font-size:.58rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--white); opacity:.4; margin-top:.2rem; display:block; }
+
+    .hero__bar { position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; padding:1rem 3rem; border-top:1px solid rgba(240,237,232,.08);
+      opacity:0; animation:fadeIn .6s ease 1s forwards; }
+    .hero__bar-left { display:flex; align-items:center; gap:.75rem; }
+    .hero__dot { width:7px; height:7px; background:var(--red); border-radius:50%; animation:pulse 2s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+    .hero__bar-text { font-family:var(--ff-cond); font-size:.72rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--white); opacity:.4; }
+    .hero__cta { font-family:var(--ff-disp); font-size:1.1rem; letter-spacing:.08em; color:var(--black); background:var(--white); padding:.7rem 2rem; text-decoration:none; position:relative; overflow:hidden; transition:color .3s; }
+    .hero__cta::before { content:''; position:absolute; inset:0; background:var(--gold); transform:translateX(-101%); transition:transform .3s var(--ease); }
+    .hero__cta:hover::before { transform:translateX(0); }
+    .hero__cta span { position:relative; z-index:1; }
+
+    /* ── Services ──────────────────────────────────────────── */
+    .services { padding:6rem 3rem; }
+    .sec-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:3.5rem; gap:2rem; }
+    .sec-tag { font-family:var(--ff-cond); font-size:.68rem; font-weight:700; letter-spacing:.25em; text-transform:uppercase; color:var(--gold); margin-bottom:.75rem; }
+    .sec-title { font-family:var(--ff-disp); font-size:clamp(2.5rem,6vw,5rem); line-height:.9; color:var(--white); }
+    .sec-sub { font-family:var(--ff-cond); font-size:.9rem; font-weight:300; line-height:1.6; color:var(--sub); max-width:28ch; text-align:right; }
+
+    .services-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--gray-lt); }
+    .svc-card { background:var(--gray); padding:2rem; position:relative; overflow:hidden; transition:background .3s; }
+    .svc-card:hover { background:var(--gray-lt); }
+    .svc-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--gold); transform:scaleX(0); transform-origin:left; transition:transform .4s var(--ease); }
+    .svc-card:hover::before { transform:scaleX(1); }
+    .svc-icon { font-size:1.5rem; margin-bottom:1.25rem; display:block; }
+    .svc-name { font-family:var(--ff-disp); font-size:1.4rem; letter-spacing:.04em; color:var(--white); margin-bottom:.4rem; }
+    .svc-desc { font-size:.8rem; line-height:1.6; color:var(--sub); margin-bottom:1.25rem; }
+    .svc-price { font-family:var(--ff-cond); font-size:1.1rem; font-weight:700; color:var(--gold); }
+    .svc-time { font-family:var(--ff-cond); font-size:.65rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--sub); margin-left:.5rem; }
+
+    /* ── Social proof ──────────────────────────────────────── */
+    .proof { background:var(--gray); padding:5rem 3rem; }
+    .proof__inner { display:grid; grid-template-columns:1fr 2fr; gap:5rem; align-items:center; }
+    .proof__left-title { font-family:var(--ff-disp); font-size:clamp(3rem,6vw,5rem); line-height:.9; color:var(--white); margin-bottom:1.5rem; }
+    .proof__left-title span { color:var(--gold); }
+    .proof__rating { display:flex; align-items:center; gap:.75rem; margin-bottom:1rem; }
+    .stars { color:var(--gold); font-size:1.1rem; letter-spacing:.1em; }
+    .rating-text { font-family:var(--ff-cond); font-size:.85rem; font-weight:700; color:var(--sub); }
+    .proof__reviews { display:flex; flex-direction:column; gap:1px; background:var(--gray-lt); }
+    .review { background:var(--gray); padding:1.75rem; }
+    .review__text { font-size:.88rem; line-height:1.7; color:var(--white); opacity:.7; margin-bottom:1rem; font-style:italic; }
+    .review__author { display:flex; align-items:center; gap:.75rem; }
+    .review__avatar { width:36px; height:36px; border-radius:50%; background:var(--gray-lt); overflow:hidden; flex-shrink:0; }
+    .review__avatar img { width:100%; height:100%; object-fit:cover; }
+    .review__name { font-family:var(--ff-cond); font-size:.85rem; font-weight:700; color:var(--white); }
+    .review__date { font-family:var(--ff-cond); font-size:.68rem; color:var(--sub); }
+
+    /* ── Gallery strip ─────────────────────────────────────── */
+    .gallery { display:grid; grid-template-columns:repeat(5,1fr); height:260px; }
+    .gallery__item { overflow:hidden; position:relative; }
+    .gallery__item img { width:100%; height:100%; object-fit:cover; filter:grayscale(80%); transition:filter .4s, transform .4s; }
+    .gallery__item:hover img { filter:grayscale(0%); transform:scale(1.05); }
+
+    /* ── Book section ──────────────────────────────────────── */
+    .book-section { padding:6rem 3rem; display:grid; grid-template-columns:1fr 1fr; gap:6rem; align-items:start; }
+
+    .book-left__tag { margin-bottom:1.25rem; }
+    .book-left__title { font-family:var(--ff-disp); font-size:clamp(3rem,6vw,5.5rem); line-height:.88; color:var(--white); margin-bottom:2rem; }
+    .book-left__title .stroke { -webkit-text-stroke:1px rgba(240,237,232,.3); color:transparent; }
+
+    .book-left__steps { display:flex; flex-direction:column; gap:0; }
+    .book-step { display:flex; gap:1.25rem; padding:1.25rem 0; border-bottom:1px solid var(--gray-lt); }
+    .book-step:last-child { border-bottom:none; }
+    .book-step__num { font-family:var(--ff-disp); font-size:2.5rem; color:var(--gold); opacity:.4; line-height:1; flex-shrink:0; width:36px; }
+    .book-step__body {}
+    .book-step__title { font-family:var(--ff-cond); font-size:1rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--white); margin-bottom:.3rem; }
+    .book-step__desc { font-size:.82rem; line-height:1.6; color:var(--sub); }
+    .book-step__time { font-family:var(--ff-cond); font-size:.65rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--red); margin-top:.3rem; }
+
+    /* ── Book card ─────────────────────────────────────────── */
+    .book-card { background:var(--gray); border:1px solid var(--gray-lt); padding:2.25rem; position:sticky; top:6rem; }
+    .book-card__title { font-family:var(--ff-disp); font-size:1.8rem; letter-spacing:.04em; color:var(--white); margin-bottom:.3rem; }
+    .book-card__sub { font-size:.78rem; color:var(--sub); margin-bottom:1.75rem; line-height:1.5; }
+
+    /* Form */
+    .fg { margin-bottom:1rem; }
+    .fg label { display:block; font-family:var(--ff-cond); font-size:.65rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--sub); margin-bottom:.35rem; }
+    .fg input, .fg select { width:100%; padding:.8rem 1rem; background:var(--black); border:1px solid var(--gray-lt); color:var(--white); font-family:var(--ff-body); font-size:.88rem; outline:none; border-radius:0; -webkit-appearance:none; transition:border-color .2s, box-shadow .2s; }
+    .fg input::placeholder { color:rgba(240,237,232,.2); }
+    .fg input:focus, .fg select:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(191,161,74,.12); }
+    .fg input.err { border-color:var(--red); }
+    .ferr { font-size:.72rem; color:#ff8080; margin-top:.3rem; display:none; }
+    .ferr.show { display:block; }
+    .frow { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
+
+    .consent { background:rgba(255,255,255,.03); border:1px solid var(--gray-lt); padding:.9rem; margin:1.1rem 0; }
+    .ci { display:flex; align-items:flex-start; gap:.65rem; margin-bottom:.65rem; }
+    .ci:last-child { margin-bottom:0; }
+    .ci input[type=checkbox] { width:14px; height:14px; margin-top:2px; flex-shrink:0; accent-color:var(--gold); }
+    .ci label { font-size:.72rem; line-height:1.5; color:var(--sub); text-transform:none; letter-spacing:0; font-weight:400; font-family:var(--ff-body); }
+
+    .gerr { background:rgba(200,32,47,.12); border:1px solid rgba(200,32,47,.3); padding:.7rem 1rem; font-size:.78rem; color:#ff8080; margin-bottom:1rem; display:none; }
+    .gerr.show { display:block; }
+
+    .btn-book { width:100%; padding:.95rem; background:var(--gold); color:var(--black); border:none; font-family:var(--ff-disp); font-size:1.3rem; letter-spacing:.06em; cursor:none; position:relative; overflow:hidden; transition:color .3s; margin-top:.25rem; }
+    .btn-book::before { content:''; position:absolute; inset:0; background:var(--red); transform:translateX(-101%); transition:transform .3s var(--ease); }
+    .btn-book:hover::before { transform:translateX(0); }
+    .btn-book:hover { color:var(--white); }
+    .btn-book .bt, .btn-book .bl { position:relative; z-index:1; }
+    .btn-book .bl { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; z-index:1; transition:opacity .2s; }
+    .btn-book.loading .bt { opacity:0; }
+    .btn-book.loading .bl { opacity:1; }
+    .spin { width:16px; height:16px; border:2px solid rgba(0,0,0,.2); border-top-color:var(--black); border-radius:50%; animation:spin .7s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .fnote { font-family:var(--ff-cond); font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--sub); text-align:center; margin-top:.65rem; opacity:.4; }
+
+    /* Success */
+    .success { display:none; text-align:center; padding:2.5rem 1rem; }
+    .success.show { display:block; }
+    .succ-icon { width:52px; height:52px; border:1px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; }
+    .succ-icon svg { width:22px; height:22px; color:var(--gold); }
+    .success h3 { font-family:var(--ff-disp); font-size:2.2rem; color:var(--white); margin-bottom:.5rem; letter-spacing:.04em; }
+    .success p { font-size:.85rem; color:var(--sub); line-height:1.7; }
+
+    /* ── Calendly modal ────────────────────────────────────── */
+    .cal-overlay { display:none; position:fixed; inset:0; z-index:500; background:rgba(6,6,6,.94); backdrop-filter:blur(10px); align-items:center; justify-content:center; padding:2rem; }
+    .cal-overlay.open { display:flex; }
+    .cal-modal { background:var(--gray); border:1px solid var(--gray-lt); width:100%; max-width:880px; max-height:88vh; overflow:hidden; display:flex; flex-direction:column; }
+    .cal-modal__hdr { display:flex; align-items:center; justify-content:space-between; padding:1.1rem 1.5rem; border-bottom:1px solid var(--gray-lt); flex-shrink:0; }
+    .cal-modal__title { font-family:var(--ff-disp); font-size:1.4rem; letter-spacing:.05em; color:var(--white); }
+    .cal-modal__title span { color:var(--gold); }
+    .cal-modal__close { width:34px; height:34px; background:var(--gray-lt); border:none; color:var(--white); font-size:1rem; display:flex; align-items:center; justify-content:center; cursor:none; transition:background .2s; flex-shrink:0; }
+    .cal-modal__close:hover { background:var(--red); }
+    .cal-modal__body { flex:1; overflow:hidden; }
+    .calendly-inline-widget { width:100%; height:640px; }
+
+    /* ── Footer ────────────────────────────────────────────── */
+    footer { background:var(--off); border-top:1px solid var(--gray-lt); padding:3rem; display:grid; grid-template-columns:1fr 1fr 1fr; gap:3rem; margin-bottom:44px; }
+    .footer__brand-name { font-family:var(--ff-disp); font-size:1.8rem; letter-spacing:.1em; color:var(--white); display:block; margin-bottom:.3rem; }
+    .footer__brand-sub { font-family:var(--ff-cond); font-size:.62rem; font-weight:700; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:1rem; }
+    .footer__desc { font-size:.82rem; line-height:1.7; color:var(--sub); }
+    .footer__col-title { font-family:var(--ff-cond); font-size:.68rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin-bottom:1rem; }
+    .footer__links { display:flex; flex-direction:column; gap:.6rem; }
+    .footer__links a { font-size:.83rem; color:var(--sub); text-decoration:none; transition:color .2s; }
+    .footer__links a:hover { color:var(--white); }
+    .footer__info { display:flex; flex-direction:column; gap:.6rem; font-size:.83rem; color:var(--sub); }
+    .footer__copy { grid-column:1/-1; border-top:1px solid var(--gray-lt); padding-top:1.5rem; display:flex; align-items:center; justify-content:space-between; }
+    .footer__copy p { font-size:.72rem; color:var(--sub); opacity:.4; }
+    .powered { font-family:var(--ff-cond); font-size:.65rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--gold); opacity:.6; text-decoration:none; }
+
+    /* ── Animations ────────────────────────────────────────── */
+    @keyframes up { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .reveal { opacity:0; transform:translateY(24px); transition:opacity .8s ease, transform .8s var(--ease); }
+    .reveal.in { opacity:1; transform:translateY(0); }
+
+    /* ── Responsive ────────────────────────────────────────── */
+    @media (max-width:960px) {
+      * { cursor:auto !important; }
+      #cur,#cur-dot { display:none; }
+      nav { padding:1rem 1.5rem; }
+      .nav__links { display:none; }
+      .hero__content { padding:7rem 1.5rem 2rem; }
+      .hero__num { display:none; }
+      .hero__bottom { flex-direction:column; align-items:flex-start; }
+      .hero__bar { padding:1rem 1.5rem; }
+      .services { padding:4rem 1.5rem; }
+      .services-grid { grid-template-columns:1fr 1fr; }
+      .sec-header { flex-direction:column; align-items:flex-start; }
+      .sec-sub { text-align:left; }
+      .proof { padding:4rem 1.5rem; }
+      .proof__inner { grid-template-columns:1fr; gap:2.5rem; }
+      .gallery { grid-template-columns:repeat(3,1fr); height:200px; }
+      .gallery__item:nth-child(n+4) { display:none; }
+      .book-section { grid-template-columns:1fr; padding:4rem 1.5rem; gap:3rem; }
+      .frow { grid-template-columns:1fr; }
+      .book-card { position:static; }
+      footer { grid-template-columns:1fr; padding:2.5rem 1.5rem; gap:2rem; }
+      .footer__copy { flex-direction:column; gap:.75rem; align-items:flex-start; }
+      .demo-banner { padding:.6rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div id="cur">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="9" cy="9" r="4" stroke="white" stroke-width="1.5"/>
+      <circle cx="19" cy="9" r="4" stroke="white" stroke-width="1.5"/>
+      <line x1="12.5" y1="11.5" x2="21" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="15.5" y1="11.5" x2="7" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="12.5" y1="11.5" x2="15.5" y2="11.5" stroke="white" stroke-width="1.5"/>
+    </svg>
+  </div>
+  <div id="cur-dot"></div>
+
+  <!-- Demo Banner -->
+  <div class="demo-banner">
+    <span class="demo-banner__text">⚡ This is a live NovuLeads demo — your shop could look exactly like this</span>
+    <a href="mailto:sofia@novuleads.com" class="demo-banner__cta">Get Your Page →</a>
+  </div>
+
+  <!-- Ticker -->
+  <div class="ticker">
+    <div class="ticker__track">
+      <span class="ticker__item">Wynwood, Miami <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Open Mon–Sat · 9AM–8PM <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Book Online — Instant Confirmation <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Walk-ins Welcome <span class="ticker__dot"></span></span>
+      <span class="ticker__item">★ 4.9 on Google · 340+ Reviews <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Wynwood, Miami <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Open Mon–Sat · 9AM–8PM <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Book Online — Instant Confirmation <span class="ticker__dot"></span></span>
+      <span class="ticker__item">Walk-ins Welcome <span class="ticker__dot"></span></span>
+      <span class="ticker__item">★ 4.9 on Google · 340+ Reviews <span class="ticker__dot"></span></span>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav>
+    <a href="#" class="nav__logo">
+      <span class="nav__logo-main">FADE CULTURE</span>
+      <span class="nav__logo-sub">Barbershop · Wynwood</span>
+    </a>
+    <div class="nav__links">
+      <a href="#services">Services</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#book">Location</a>
+    </div>
+    <a href="#book" class="nav__book">Book Now</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__bg"></div>
+    <div class="hero__num">01</div>
+    <div class="hero__accent"></div>
+
+    <div class="hero__content">
+      <p class="hero__tag">Wynwood's Premier Barbershop · Est. 2019</p>
+      <h1 class="hero__title">
+        YOUR<br>
+        <span class="stroke">BEST</span><br>
+        <span class="gold">FADE.</span><br>
+        EVER.
+      </h1>
+      <div class="hero__bottom">
+        <p class="hero__desc">Precision fades. Straight razor shaves. No waiting, no missed DMs — just book your spot online and we'll confirm in 2 minutes.</p>
+        <div class="hero__stats">
+          <div class="hero__stat">
+            <span class="hero__stat-n">4.9</span>
+            <span class="hero__stat-l">Google Rating</span>
+          </div>
+          <div class="hero__stat">
+            <span class="hero__stat-n">340+</span>
+            <span class="hero__stat-l">Reviews</span>
+          </div>
+          <div class="hero__stat">
+            <span class="hero__stat-n">2min</span>
+            <span class="hero__stat-l">Confirmation</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__bar">
+      <div class="hero__bar-left">
+        <div class="hero__dot"></div>
+        <span class="hero__bar-text">Open now · Wynwood, Miami</span>
+      </div>
+      <a href="#book" class="hero__cta"><span>Book Your Cut →</span></a>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="services" id="services">
+    <div class="sec-header reveal">
+      <div>
+        <p class="sec-tag">What we do</p>
+        <h2 class="sec-title">THE<br>MENU.</h2>
+      </div>
+      <p class="sec-sub">Every service delivered with precision. No rush, no shortcuts.</p>
+    </div>
+
+    <div class="services-grid reveal">
+      <div class="svc-card">
+        <span class="svc-icon">✂️</span>
+        <div class="svc-name">CLASSIC CUT</div>
+        <div class="svc-desc">Scissor or clipper cut, shaped and finished to perfection. Works on all hair types.</div>
+        <div><span class="svc-price">$35</span><span class="svc-time">45 min</span></div>
+      </div>
+      <div class="svc-card">
+        <span class="svc-icon">⚡</span>
+        <div class="svc-name">SKIN FADE</div>
+        <div class="svc-desc">Zero to any length — seamless gradient that lasts. Our most requested service.</div>
+        <div><span class="svc-price">$45</span><span class="svc-time">50 min</span></div>
+      </div>
+      <div class="svc-card">
+        <span class="svc-icon">🪒</span>
+        <div class="svc-name">STRAIGHT RAZOR</div>
+        <div class="svc-desc">Hot towel, pre-shave oil, straight razor finish. The full luxury experience.</div>
+        <div><span class="svc-price">$55</span><span class="svc-time">60 min</span></div>
+      </div>
+      <div class="svc-card">
+        <span class="svc-icon">👑</span>
+        <div class="svc-name">FULL TREATMENT</div>
+        <div class="svc-desc">Skin fade + beard trim + straight razor finish + hot towel. The works.</div>
+        <div><span class="svc-price">$80</span><span class="svc-time">75 min</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <div class="gallery">
+    <div class="gallery__item"><img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400&q=80" alt="Barber at work" loading="lazy" /></div>
+    <div class="gallery__item"><img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&q=80" alt="Clean fade" loading="lazy" /></div>
+    <div class="gallery__item"><img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400&q=80" alt="Barbershop interior" loading="lazy" /></div>
+    <div class="gallery__item"><img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=400&q=80" alt="Barber tools" loading="lazy" /></div>
+    <div class="gallery__item"><img src="https://images.unsplash.com/photo-1634302086687-ef3cb11c7da7?w=400&q=80" alt="Fresh cut" loading="lazy" /></div>
+  </div>
+
+  <!-- Social Proof -->
+  <section class="proof" id="reviews">
+    <div class="proof__inner">
+      <div class="reveal">
+        <p class="sec-tag">What clients say</p>
+        <h2 class="proof__left-title">340+<br><span>5-STAR</span><br>REVIEWS.</h2>
+        <div class="proof__rating">
+          <span class="stars">★★★★★</span>
+          <span class="rating-text">4.9 average · Google</span>
+        </div>
+        <p style="font-size:.82rem;color:var(--sub);line-height:1.6;max-width:28ch;">Wynwood's most reviewed barbershop. Every cut backed by our satisfaction guarantee.</p>
+      </div>
+      <div class="proof__reviews reveal">
+        <div class="review">
+          <p class="review__text">"Best fade I've ever had. I've been to shops in NYC, LA, and Atlanta — Fade Culture is top 3 in the country, no question. The booking system is slick too, got a confirmation text within 2 minutes."</p>
+          <div class="review__author">
+            <div class="review__avatar"><img src="https://i.pravatar.cc/36?img=11" alt="Marcus" /></div>
+            <div>
+              <div class="review__name">Marcus T.</div>
+              <div class="review__date">2 weeks ago · Google</div>
+            </div>
+          </div>
+        </div>
+        <div class="review">
+          <p class="review__text">"I used to DM like 5 barbers every time and wait hours for a reply. Here I just click the link, pick a time, and boom — confirmation in my text messages immediately. I'm never going anywhere else."</p>
+          <div class="review__author">
+            <div class="review__avatar"><img src="https://i.pravatar.cc/36?img=32" alt="DeShawn" /></div>
+            <div>
+              <div class="review__name">DeShawn R.</div>
+              <div class="review__date">1 month ago · Google</div>
+            </div>
+          </div>
+        </div>
+        <div class="review">
+          <p class="review__text">"The straight razor shave is unreal. Hot towels, the whole experience. And they texted me a reminder the morning of — I've never had a barber do that. Totally won me over."</p>
+          <div class="review__author">
+            <div class="review__avatar"><img src="https://i.pravatar.cc/36?img=57" alt="Carlos" /></div>
+            <div>
+              <div class="review__name">Carlos M.</div>
+              <div class="review__date">3 weeks ago · Google</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Book -->
+  <section class="book-section" id="book">
+    <div class="book-left">
+      <p class="sec-tag book-left__tag">Book your cut</p>
+      <h2 class="book-left__title">
+        LOCK IN<br>
+        YOUR<br>
+        <span class="stroke">SPOT.</span>
+      </h2>
+      <div class="book-left__steps">
+        <div class="book-step">
+          <div class="book-step__num">1</div>
+          <div class="book-step__body">
+            <div class="book-step__title">Fill out the form</div>
+            <div class="book-step__desc">Name, email, phone. Takes 60 seconds.</div>
+            <div class="book-step__time">⚡ Instant</div>
+          </div>
+        </div>
+        <div class="book-step">
+          <div class="book-step__num">2</div>
+          <div class="book-step__body">
+            <div class="book-step__title">Get a text confirmation</div>
+            <div class="book-step__desc">We'll text and email you within 2 minutes to confirm your spot.</div>
+            <div class="book-step__time">⚡ Under 2 minutes</div>
+          </div>
+        </div>
+        <div class="book-step">
+          <div class="book-step__num">3</div>
+          <div class="book-step__body">
+            <div class="book-step__title">Show up, get the cut</div>
+            <div class="book-step__desc">We'll remind you 24h and 2h before. Just show up and we'll handle the rest.</div>
+            <div class="book-step__time">⚡ Zero stress</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendly CTA -->
+      <div style="margin-top:2rem;">
+        <button onclick="openCal()" style="font-family:var(--ff-disp);font-size:1.1rem;letter-spacing:.06em;color:var(--black);background:var(--gold);border:none;padding:.85rem 2rem;cursor:none;position:relative;overflow:hidden;transition:color .3s;display:inline-block;">
+          <span style="position:relative;z-index:1;">PICK YOUR TIME IN THE CALENDAR →</span>
+        </button>
+        <p style="font-family:var(--ff-cond);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--sub);margin-top:.6rem;opacity:.5;">Or fill the form on the right</p>
+      </div>
+    </div>
+
+    <!-- Form card -->
+    <div class="book-card reveal">
+      <h3 class="book-card__title">BOOK YOUR SPOT</h3>
+      <p class="book-card__sub">Confirmation text within 2 minutes. No credit card needed.</p>
+
+      <div class="gerr" id="gerr"></div>
+
+      <form id="lf" novalidate>
+        <input type="hidden" id="utm_source" />
+        <input type="hidden" id="utm_medium" />
+        <input type="hidden" id="utm_campaign" />
+
+        <div class="frow">
+          <div class="fg">
+            <label>Full Name *</label>
+            <input type="text" id="fn" placeholder="Marcus Johnson" required />
+            <span class="ferr" id="e_fn">Enter your full name.</span>
+          </div>
+          <div class="fg">
+            <label>Email *</label>
+            <input type="email" id="em" placeholder="marcus@email.com" required />
+            <span class="ferr" id="e_em">Enter a valid email.</span>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="fg">
+            <label>Phone *</label>
+            <input type="tel" id="ph" placeholder="(305) 555-0100" required />
+            <span class="ferr" id="e_ph">Enter a valid US phone.</span>
+          </div>
+          <div class="fg">
+            <label>Service</label>
+            <select id="svc">
+              <option value="">Select...</option>
+              <option value="classic_cut">Classic Cut — $35</option>
+              <option value="skin_fade">Skin Fade — $45</option>
+              <option value="straight_razor">Straight Razor — $55</option>
+              <option value="full_treatment">Full Treatment — $80</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="consent">
+          <div class="ci">
+            <input type="checkbox" id="sc" checked />
+            <label for="sc"><strong style="color:rgba(240,237,232,.75)">Text me:</strong> I agree to receive texts about my appointment. Reply STOP to opt out.</label>
+          </div>
+          <div class="ci">
+            <input type="checkbox" id="ec" checked />
+            <label for="ec"><strong style="color:rgba(240,237,232,.75)">Email me:</strong> I agree to receive emails about my booking. Unsubscribe anytime.</label>
+          </div>
+        </div>
+        <span class="ferr" id="e_co" style="margin-bottom:.75rem;">Please accept at least one contact method.</span>
+
+        <button type="submit" class="btn-book" id="sb">
+          <span class="bt">LOCK IN MY SPOT →</span>
+          <span class="bl"><span class="spin"></span></span>
+        </button>
+        <p class="fnote">🔒 Your info stays private. Never shared.</p>
+      </form>
+
+      <div class="success" id="succ">
+        <div class="succ-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+        <h3>YOU'RE IN.</h3>
+        <p>Check your phone — confirmation text coming within 2 minutes. Reminder 24h before your cut. See you at the shop.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div>
+      <span class="footer__brand-name">FADE CULTURE</span>
+      <span class="footer__brand-sub">Barbershop · Wynwood</span>
+      <p class="footer__desc">Miami's most trusted barbershop since 2019. Precision cuts, zero compromises.</p>
+    </div>
+    <div>
+      <div class="footer__col-title">Quick Links</div>
+      <div class="footer__links">
+        <a href="#services">Services & Pricing</a>
+        <a href="#reviews">Client Reviews</a>
+        <a href="#book">Book Online</a>
+        <a href="#">Instagram</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer__col-title">Visit Us</div>
+      <div class="footer__info">
+        <span>2847 NW 2nd Ave, Wynwood</span>
+        <span>Miami, FL 33127</span>
+        <span>Mon–Fri: 9AM–8PM</span>
+        <span>Sat: 9AM–6PM</span>
+        <span>Sun: Closed</span>
+      </div>
+    </div>
+    <div class="footer__copy">
+      <p>© 2026 Fade Culture Barbershop. All rights reserved.</p>
+      <a href="https://novuleads.com" class="powered" target="_blank">Powered by NovuLeads ⚡</a>
+    </div>
+  </footer>
+
+  <!-- Calendly Modal -->
+  <div class="cal-overlay" id="calOv" onclick="closeCal(event)">
+    <div class="cal-modal">
+      <div class="cal-modal__hdr">
+        <div class="cal-modal__title">PICK YOUR <span>TIME</span></div>
+        <button class="cal-modal__close" onclick="closeCal()">✕</button>
+      </div>
+      <div class="cal-modal__body">
+        <div class="calendly-inline-widget" id="calWidget" data-auto-load="false"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendly JS -->
+  <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+
+  <script>
+    // ── Config ───────────────────────────────────────────────
+    const API_URL     = 'https://vitrineia-us-production.up.railway.app/api/leads';
+    const BUSINESS_ID = '8308b000-eb0d-4ac4-a6ad-1e3ca9399936';
+    // Replace with real Calendly URL when client sets up account
+    const CAL_URL     = 'https://calendly.com/novuleads-demo/haircut';
+
+    // ── Cursor ────────────────────────────────────────────────
+    const cur = document.getElementById('cur');
+    const dot = document.getElementById('cur-dot');
+    document.addEventListener('mousemove', e => {
+      cur.style.left = dot.style.left = e.clientX + 'px';
+      cur.style.top  = dot.style.top  = e.clientY + 'px';
+    });
+
+    // ── UTM ───────────────────────────────────────────────────
+    (function() {
+      const p = new URLSearchParams(window.location.search);
+      ['utm_source','utm_medium','utm_campaign'].forEach(k => {
+        const el = document.getElementById(k);
+        if (el && p.get(k)) el.value = p.get(k);
+      });
+      const s = document.getElementById('utm_source');
+      if (s && !s.value) {
+        const r = document.referrer;
+        s.value = r.includes('instagram') ? 'instagram' : r.includes('google') ? 'google' : r ? 'referral' : 'direct';
+      }
+    })();
+
+    // ── Phone format ──────────────────────────────────────────
+    document.getElementById('ph').addEventListener('input', function() {
+      let v = this.value.replace(/\D/g,'').slice(-10);
+      if (v.length >= 6) this.value = `(${v.slice(0,3)}) ${v.slice(3,6)}-${v.slice(6)}`;
+      else if (v.length >= 3) this.value = `(${v.slice(0,3)}) ${v.slice(3)}`;
+    });
+
+    // ── Scroll reveal ─────────────────────────────────────────
+    new IntersectionObserver(
+      es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); }),
+      { threshold: .12 }
+    ).observe && document.querySelectorAll('.reveal').forEach(el =>
+      new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) el.classList.add('in'); }), {threshold:.12}).observe(el)
+    );
+
+    // ── Calendly ──────────────────────────────────────────────
+    let calLoaded = false;
+    function openCal() {
+      document.getElementById('calOv').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if (!calLoaded && typeof Calendly !== 'undefined') {
+        Calendly.initInlineWidget({ url: CAL_URL, parentElement: document.getElementById('calWidget') });
+        calLoaded = true;
+      }
+    }
+    function closeCal(e) {
+      if (!e || e.target === document.getElementById('calOv')) {
+        document.getElementById('calOv').classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    }
+    document.addEventListener('keydown', e => { if(e.key==='Escape') closeCal(); });
+
+    window.addEventListener('message', e => {
+      if (e.data?.event === 'calendly.event_scheduled') {
+        closeCal();
+        setTimeout(() => {
+          document.getElementById('lf').style.display = 'none';
+          document.getElementById('succ').classList.add('show');
+          document.getElementById('book').scrollIntoView({ behavior:'smooth' });
+        }, 600);
+      }
+    });
+
+    // ── Form ──────────────────────────────────────────────────
+    function se(fid, eid, show) {
+      const f=document.getElementById(fid), e=document.getElementById(eid);
+      if(f) f.classList.toggle('err', show);
+      if(e) e.classList.toggle('show', show);
+    }
+
+    document.getElementById('lf').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('sb');
+      const gerr = document.getElementById('gerr');
+
+      const fn = document.getElementById('fn').value.trim();
+      const em = document.getElementById('em').value.trim().toLowerCase();
+      const ph = document.getElementById('ph').value;
+      const sc = document.getElementById('sc').checked;
+      const ec = document.getElementById('ec').checked;
+
+      let ok = true;
+      if(fn.length < 2)                    { se('fn','e_fn',true); ok=false; } else se('fn','e_fn',false);
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { se('em','e_em',true); ok=false; } else se('em','e_em',false);
+      const d = ph.replace(/\D/g,'');
+      if(d.length < 10)                    { se('ph','e_ph',true); ok=false; } else se('ph','e_ph',false);
+      document.getElementById('e_co').classList.toggle('show', !sc && !ec);
+      if(!sc && !ec) ok=false;
+      if(!ok) return;
+
+      const phone = d.length===10 ? `+1${d}` : `+${d}`;
+      btn.disabled=true; btn.classList.add('loading'); gerr.classList.remove('show');
+
+      try {
+        const res = await fetch(API_URL, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            full_name: fn, email: em, phone, sms_consent: sc, email_consent: ec,
+            business_id: BUSINESS_ID, source: document.getElementById('utm_source').value || 'organic',
+            notes: document.getElementById('svc').value ? `Service: ${document.getElementById('svc').value}` : null,
+          }),
+        });
+        const json = await res.json();
+        if(res.ok || res.status===409) {
+          this.style.display='none';
+          document.getElementById('succ').classList.add('show');
+        } else throw new Error(json.error || 'Something went wrong.');
+      } catch(err) {
+        gerr.textContent = err.message;
+        gerr.classList.add('show');
+        btn.disabled=false; btn.classList.remove('loading');
+      }
+    });
+  </script>
+</body>
+</html>
